@@ -55,6 +55,6 @@ class OpnMenu(Menu):
 	def show(self):
 		controls = self.controls
 		screen = self.screen
-		screen.text(f"ADLmidi.\npress {controls.name_for(self.left)} and {controls.name_for(self.right)} to switch instrument.")
+		screen.text(f"OPNmidi.\npress {controls.name_for(self.left)} and {controls.name_for(self.right)} to switch instrument.")
 		self.process.start(error=lambda message: screen.error(message))
 		self.subscribe()
