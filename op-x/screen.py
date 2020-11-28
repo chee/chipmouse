@@ -1,6 +1,7 @@
 from tkinter.constants import TOP
 from PIL import Image, ImageDraw
 from .mode import Mode
+import textwrap
 
 class Colors():
 	black = (0x00, 0x00, 0x00)
@@ -46,23 +47,22 @@ class Screen():
 				 size=(self.width, self.height),
 				 color=color)
 	def clear(self):
-		print("clear")
 		return self.show(self.image())
 
 	def text(self, text, xy=(0, 0), color=(0xff, 0xff, 0xff)):
-		print("text:", text)
 		image = self.image()
+		wrapped_text = "\n".join(textwrap.wrap(text, width=self.width // 5))
 		ImageDraw.Draw(image).text(xy=xy,
-					   text=text,
+					   text=wrapped_text,
 					   fill=color)
 		return self.show(image)
-
+	def error(self, text):
+		return self.text(text, color=(255, 0, 0))
 	def menu(self, options, active):
 		image = self.image()
 		index = 0
 		for option in options:
 			y = index * self.text_height
-			print(option)
 			xy = (0, y)
 			color = self.colors.white
 			if option == active:

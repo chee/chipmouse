@@ -18,18 +18,43 @@ class Controls():
 	level = Level.default
 	down_callback = None
 	up_callback = None
+	names = {
+		Mode.PI: {
+			Control.top_left: 'a',
+			Control.bottom_left: 'b',
+			Control.top_right: 'x',
+			Control._bottom_right: 'y',
+		},
+		Mode.COMPUTER: {
+			Control.top_left: 'q',
+			Control.bottom_left: 'a',
+			Control.top_right: 'w',
+			Control._bottom_right: 's',
+		}
+	}
 	buttons = {
 		5:  Control.top_left,
-		6:  Control.top_right,
-		16: Control.bottom_left,
+		6:  Control.bottom_left,
+		16: Control.top_right,
 		24: Control._bottom_right
 	}
 	keys = {
-		'q':  Control.top_left,
-		'w':  Control.top_right,
+		'q': Control.top_left,
+		'w': Control.top_right,
 		'a': Control.bottom_left,
 		's': Control._bottom_right
 	}
+	def name_for(self, control: Control):
+		names = self.names[self.mode]
+		if control in names:
+			return names[control]
+		if control is Control.menu_exit:
+			return f"{names[Control._bottom_right]} and {names[Control.top_left]}"
+		if control is Control.menu_yes:
+			return f"{names[Control._bottom_right]} and {names[Control.top_right]}"
+		if control is Control.menu_next:
+			return f"{names[Control._bottom_right]} and {names[Control.bottom_left]}"
+
 	def __init__(self, mode):
 		self.mode = mode
 		if mode is Mode.PI:
@@ -73,7 +98,6 @@ class Controls():
 	def subscribe(self, down_callback, up_callback):
 		self.down_callback = down_callback
 		self.up_callback = up_callback
-		print("subscribed")
-		if self.mode is Mode.COMPUTER:
-			from . import tkroot
-			tkroot
+	def unsubscribe(self):
+		self.down_callback = None
+		self.up_callback = None

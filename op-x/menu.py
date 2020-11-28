@@ -1,4 +1,5 @@
-from typing import Any, List, Dict
+from abc import abstractmethod, abstractproperty, ABCMeta
+from typing import Any, List, Dict, Optional
 from .view import View
 from .mode import Mode
 from .screen import Screen
@@ -9,14 +10,42 @@ class Option():
 		self.name = name
 		self.value = value
 
-class Menu():
-	def __init__(self, mode: Mode, options: List[Option]):
-		self.mode = mode
+class Menu(metaclass=ABCMeta):
+	parent: Optional['Menu'] = None
+	_screen: Optional[Screen] = None
+	_controls: Optional[Controls] = None
+
+	@property
+	@abstractmethod
+	def name(self):
+		pass
+
+	@property
+	def screen(self):
+		if self._screen:
+			return self._screen
+		elif self.parent:
+			return self.parent.screen
+		else:
+			raise RuntimeError("no parent, no screen")
+
+	@property
+	def controls(self):
+		if self._controls:
+			return self._controls
+		elif self.parent:
+			return self.parent.controls
+		else:
+			raise RuntimeError("no parents and no controls")
+
+	def __init__(self, options: List[Option]):
 		self.options = options
 		self.active = 0
-		self.screen = Screen(mode)
-		self.controls = Controls(mode)
-		self.controls.subscribe(None, self.handle_control)
+
+	def set_platform(self, screen, controls):
+		self._screen = screen
+		self._controls = controls
+
 	def inc(self):
 		number_of_options = len(self.options)
 		if self.active >= number_of_options - 1:
@@ -30,32 +59,28 @@ class Menu():
 		else:
 			self.active -= 1
 	def handle_control(self, control):
-		print("hello")
-		print(control)
 		if control is Control.menu_next:
 			self.inc()
 			self.show()
+		if control is Control.menu_exit:
+			self.quit()
+		if control is Control.menu_yes:
+			self.select(self.options[self.active])
 	def option_names(self):
 		return map(lambda o : o.name, self.options)
 	def active_name(self):
 		return self.options[self.active].name
+	def subscribe(self):
+		self.controls.subscribe(None, self.handle_control)
 	def show(self):
-		if self.mode is Mode.PI:
-			self.screen.clear()
 		self.screen.menu(options=self.option_names(),
 				 active=self.active_name())
+	@abstractmethod
 	def select(self, option):
-		return option
+		pass
 
-
-class MainMenu(Menu):
-	def __init__(self, mode: Mode, views: List[View]):
-		# options = map(lambda v: Option(v.name, v), views)
-		options = [
-			Option("coffee", None),
-			Option("tea", None),
-			Option("mackerel", None),
-		]
-		super().__init__(mode, list(options))
-	def select(self, view):
-		view.start()
+	def quit(self):
+		if self.parent:
+			self.controls.unsubscribe()
+			self.parent.subscribe()
+			self.parent.show()
