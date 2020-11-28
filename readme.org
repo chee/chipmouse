@@ -1,0 +1,14 @@
+* op-x
+
+Requirements:
+
+- raspberry pi zero wh
+- pirate audio headphone amp
+- op-1
+- a running jack2 server
+- a2jmidid
+- adlrt
+
+
+** Setup
+1. install arch linux on your rapsberry pi microsd https://archlinuxarm.org/platforms/armv6/raspberry-pi
