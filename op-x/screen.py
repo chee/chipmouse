@@ -10,6 +10,7 @@ class Colors():
 class Screen():
 	current_image = None
 	text_height = 10
+	margin = 10
 	colors = Colors()
 	def __init__(self, mode):
 		self.mode = mode
@@ -27,13 +28,15 @@ class Screen():
 			self.width = self.st7789.width
 			self.height = self.st7789.height
 		if mode is Mode.COMPUTER:
-			self.width = 200
-			self.height = 200
+			self.width = 240
+			self.height = 240
 			from . import tkroot
 			import tkinter
 			self.canvas = tkinter.Canvas(tkroot, width=self.width, height=self.height)
 			self.canvas.pack()
-	def show(self, image: Image.Image):
+	def show(self, image: Image.Image, hint=False):
+		if not hint:
+			self.current_image = image
 		if self.mode is Mode.COMPUTER:
 			from tkinter import NW
 			from PIL import ImageTk
@@ -42,6 +45,22 @@ class Screen():
 			self.canvas.pack(side=TOP, expand=True)
 		if self.mode is Mode.PI:
 			self.st7789.display(image)
+	def overlay_menu_hint(self):
+		image = self.current_image.copy()
+		width = self.margin / 2
+		length = self.margin * 2
+		tl_position = ((0, 0), (width, length))
+		tr_position = ((self.width, 0), (self.width - width, length))
+		bl_position = ((0, self.height - length), (width, self.height))
+		ImageDraw.Draw(image).rectangle(xy=tl_position, fill=(255, 150, 0))
+		ImageDraw.Draw(image).rectangle(xy=tr_position, fill=(0, 255, 50))
+		ImageDraw.Draw(image).rectangle(xy=bl_position, fill=(0, 255, 255))
+		self.show(image, hint=True)
+	def remove_menu_hint(self):
+		if self.current_image:
+			self.show(self.current_image)
+		else:
+			raise RuntimeError("Somehow there was no current_image when trying to remove menu hint?")
 	def image(self, color=(0x00, 0x00, 0x00)):
 		return Image.new(mode="RGB",
 				 size=(self.width, self.height),
@@ -49,9 +68,9 @@ class Screen():
 	def clear(self):
 		return self.show(self.image())
 
-	def text(self, text, xy=(0, 0), color=(0xff, 0xff, 0xff)):
+	def text(self, text, xy=(margin, 0), color=(0xff, 0xff, 0xff)):
 		image = self.image()
-		wrapped_text = "\n".join(textwrap.wrap(text, width=self.width // 5))
+		wrapped_text = "\n".join(textwrap.wrap(text, width=self.width // 6))
 		ImageDraw.Draw(image).text(xy=xy,
 					   text=wrapped_text,
 					   fill=color)
