@@ -12,3 +12,9 @@ Requirements:
 
 ** Setup
 1. install arch linux on your rapsberry pi microsd https://archlinuxarm.org/platforms/armv6/raspberry-pi
+
+
+** hoo-hoo
+
+#+caption: an early gif of menu action
+[[file:./assets/menu1.gif]]
