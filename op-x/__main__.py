@@ -17,6 +17,7 @@ from .menus.backup import BackupMenu
 from .menus.main import MainMenu
 from .menus.adl import AdlMenu, OpnMenu
 from .menus.speak import SpeakMenu
+from .menus.synth import SynthMenu
 
 if args.mode is Mode.COMPUTER:
 	from . import tkroot
@@ -33,6 +34,7 @@ menu = MainMenu([
 	OpnMenu(),
 	AdlMenu(),
 	BackupMenu(),
+	SynthMenu(),
 	SpeakMenu()
 ])
 
