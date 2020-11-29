@@ -27,6 +27,7 @@ class AdlType(Enum):
 	opn = 'opn'
 
 class AdlProcess():
+	frame = 0
 	jack_client_name = "op-x"
 	def __init__(self, type=AdlType.adl):
 		self.type = type
@@ -40,8 +41,8 @@ class AdlProcess():
 	@property
 	def port(self):
 		return self.client.midi_outports[0]
-	def write_midi_event(self, event):
-		return self.port.write_midi_event(0, event)
+	def write_midi(self, event):
+		return self.port.write_midi_event(self.frame, event)
 	def start(self, error):
 		self.process = subprocess.Popen(self.command)
 		sleep(1)
@@ -101,11 +102,12 @@ class AdlProcess():
 		self.client.deactivate()
 		self.process.terminate()
 	def program_change(self, program):
-		self.write_midi_event([
+		self.write_midi([
 				0xc0,
 				program
 			])
 		pass
 
 	def _jack_process_callback(self, frame):
+		self.frame += frame
 		pass
