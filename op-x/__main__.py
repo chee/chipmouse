@@ -16,6 +16,7 @@ args = parser.parse_args()
 from .menus.backup import BackupMenu
 from .menus.main import MainMenu
 from .menus.adl import AdlMenu, OpnMenu
+from .menus.speak import SpeakMenu
 
 if args.mode is Mode.COMPUTER:
 	from . import tkroot
@@ -31,7 +32,8 @@ screen = Screen(args.mode)
 menu = MainMenu([
 	OpnMenu(),
 	AdlMenu(),
-	BackupMenu()
+	BackupMenu(),
+	SpeakMenu()
 ])
 
 menu.set_platform(controls=controls,

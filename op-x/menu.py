@@ -108,15 +108,19 @@ class Menu(metaclass=ABCMeta):
 			return self.options[self.active]
 		else:
 			return None
+	@property
 	def active_name(self):
-		return self.active_option and self.active_option.name
+		if self.active_option:
+			return self.active_option.name
+	@property
 	def active_value(self):
-		return self.active_option and self.active_option.value
+		if self.active_option:
+			return self.active_option.value
 	def take_control(self):
 		self.controls.take(self.handle_control_down, self.handle_control_up)
 	def show(self):
 		self.screen.menu(options=self.option_names(),
-				 active=self.active_name())
+				 active=self.active_name)
 	def start(self):
 		pass
 
@@ -178,7 +182,7 @@ class ValueMenu(Menu):
 			self.fine = False
 	def show(self):
 		self.screen.value_menu(values=self.options,
-				       active=self.active_name())
+				       active=self.active_name)
 
 
 class MenuWithSubmenus(Menu):

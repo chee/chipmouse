@@ -8,6 +8,7 @@ Requirements:
 - a running jack2 server
 - a2jmidid
 - adlrt
+- espeak
 
 
 ** Setup

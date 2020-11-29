@@ -45,6 +45,12 @@ class Screen():
 			self.canvas.pack(side=TOP, expand=True)
 		if self.mode is Mode.PI:
 			self.st7789.display(image)
+	def overlay_text(self, text):
+		image = self.current_image.copy()
+		ImageDraw.Draw(image).text(xy=(0, self.height - self.text_height),
+					   text=text,
+					   fill=(100, 200, 250))
+		self.show(image, hint=True)
 	def overlay_menu_hint(self):
 		image = self.current_image.copy()
 		width = self.margin / 2
