@@ -126,3 +126,70 @@ class Menu(metaclass=ABCMeta):
 	def quit(self):
 		if self.parent:
 			self.parent.show()
+			self.parent.take_control()
+
+class CyanMenuValue(MenuValue):
+	def __init__(self, name, default=0):
+		super().__init__(name=name, color=(0, 150, 150), default=default)
+
+class YellowMenuValue(MenuValue):
+	def __init__(self, name, default=0):
+		super().__init__(name=name, color=(150, 100, 30), default=default)
+
+class GreenMenuValue(MenuValue):
+	def __init__(self, name, default=0):
+		super().__init__(name=name, color=(0, 120, 0), default=default)
+
+class BlueMenuValue(MenuValue):
+	def __init__(self, name, default=0):
+		super().__init__(name=name, color=(30, 70, 180), default=default)
+
+class ValueMenu(Menu):
+	fine = False
+	options: List[MenuValue]
+	def __init__(self, options: List[MenuValue]):
+		self.options = options
+		self.active = 0
+		for menu_value in options:
+			menu_value.sub(self.show)
+	def inc_active_option(self):
+		av = self.active_option
+		if not av:
+			return
+		if isinstance(av, MenuValue):
+			av.inc(fine=self.fine)
+	def dec_active_option(self):
+		av = self.active_option
+		if not av:
+			return
+		if isinstance(av, MenuValue):
+			av.dec(fine=self.fine)
+	def handle_control_down(self, control):
+		super().handle_control_down(control)
+		if control is Control.bottom_left and self.controls.level is not Level.menu:
+			self.fine = True
+	def handle_control_up(self, control):
+		super().handle_control_up(control)
+		if control is Control.top_right:
+			self.inc_active_option()
+		if control is Control.top_left:
+			self.dec_active_option()
+		if control is Control.bottom_left:
+			self.fine = False
+	def show(self):
+		self.screen.value_menu(values=self.options,
+				       active=self.active_name())
+
+
+class MenuWithSubmenus(Menu):
+	def __init__(self, submenus: List[Menu]):
+		options = []
+		for menu in submenus:
+			menu.parent = self
+			options.append(Option(menu.name, menu))
+		super().__init__(list(options))
+
+	def select(self, option):
+		option.value.show()
+		option.value.start()
+		option.value.take_control()

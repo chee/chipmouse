@@ -10,6 +10,7 @@ class Control(Enum):
 	top_right = 'TR'
 	bottom_left = 'BL'
 	_bottom_right = 'BR'
+	menu_active = 'menu_active'
 	menu_next = 'mnext'
 	menu_yes = 'myes'
 	menu_exit = 'mexit'
@@ -79,11 +80,15 @@ class Controls():
 	def down(self, control: Control):
 		if control is Control._bottom_right:
 			self.level = Level.menu
+			if self.down_callback:
+				self.down_callback(Control.menu_active)
 		elif self.down_callback:
 			self.down_callback(control)
 	def up(self, control: Control):
 		if control is Control._bottom_right and self.level is Level.menu:
 			self.level = Level.default
+			if self.up_callback:
+				self.up_callback(Control.menu_active)
 		if self.up_callback is None:
 			return
 		if self.level is Level.menu:
@@ -95,9 +100,6 @@ class Controls():
 				self.up_callback(Control.menu_next)
 		else:
 			self.up_callback(control)
-	def subscribe(self, down_callback, up_callback):
+	def take(self, down_callback, up_callback):
 		self.down_callback = down_callback
 		self.up_callback = up_callback
-	def unsubscribe(self):
-		self.down_callback = None
-		self.up_callback = None

@@ -9,10 +9,10 @@ class AdlMenu(Menu):
 	right = Control.top_right
 	left = Control.top_left
 	process = AdlProcess(type=AdlType.adl)
-	def select(self):
+	def select(self, _):
 		pass
-	def handle_control(self, control):
-		super().handle_control(control)
+	def handle_control_down(self, control):
+		super().handle_control_up(control)
 		if control is self.right:
 			self.program.inc()
 			self.process.program_change(self.program.value())
@@ -25,11 +25,15 @@ class AdlMenu(Menu):
 		super().quit()
 
 	def show(self):
-		controls = self.controls
-		screen = self.screen
-		screen.text(f"ADLmidi.\npress {controls.name_for(self.left)} and {controls.name_for(self.right)} to switch instrument.")
-		self.process.start(error=lambda message: screen.error(message))
-		self.subscribe()
+		left = self.controls.name_for(self.left)
+		right = self.controls.name_for(self.right)
+		self.screen.text(
+			f"""ADLmidi
+
+press {left} and {right} to switch instrument.""")
+
+	def start(self):
+		self.process.start(error=lambda message: self.screen.error(message))
 
 class OpnMenu(Menu):
 	name = "opn"
@@ -37,10 +41,10 @@ class OpnMenu(Menu):
 	right = Control.top_right
 	left = Control.top_left
 	process = AdlProcess(type=AdlType.opn)
-	def select(self):
+	def select(self, _):
 		pass
-	def handle_control(self, control):
-		super().handle_control(control)
+	def handle_control_down(self, control):
+		super().handle_control_down(control)
 		if control is self.right:
 			self.program.inc()
 			self.process.program_change(self.program.value())
@@ -53,8 +57,12 @@ class OpnMenu(Menu):
 		super().quit()
 
 	def show(self):
-		controls = self.controls
-		screen = self.screen
-		screen.text(f"OPNmidi.\npress {controls.name_for(self.left)} and {controls.name_for(self.right)} to switch instrument.")
-		self.process.start(error=lambda message: screen.error(message))
-		self.subscribe()
+		left = self.controls.name_for(self.left)
+		right = self.controls.name_for(self.right)
+		self.screen.text(
+			f"""OPNmidi
+
+press {left} and {right} to switch instrument.""")
+
+	def start(self):
+		self.process.start(error=lambda message: self.screen.error(message))
