@@ -13,6 +13,7 @@ parser.add_argument("-m", "--mode", type=Mode, choices=Mode, required=True)
 
 args = parser.parse_args()
 
+from .menus.backup import BackupMenu
 from .menus.main import MainMenu
 from .menus.adl import AdlMenu, OpnMenu
 
@@ -28,13 +29,13 @@ else:
 controls = Controls(args.mode)
 screen = Screen(args.mode)
 menu = MainMenu([
-	OpnMenu([]),
-	AdlMenu([])
+	OpnMenu(),
+	AdlMenu(),
+	BackupMenu()
 ])
 
 menu.set_platform(controls=controls,
 		  screen=screen)
-menu.subscribe()
+menu.take_control()
 menu.show()
-
 loop()
