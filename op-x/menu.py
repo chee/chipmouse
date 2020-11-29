@@ -68,8 +68,8 @@ class Menu(metaclass=ABCMeta):
 		return map(lambda o : o.name, self.options)
 	def active_name(self):
 		return self.options[self.active].name
-	def subscribe(self):
-		self.controls.subscribe(None, self.handle_control)
+	def take_control(self):
+		self.controls.take(None, self.handle_control)
 	def show(self):
 		self.screen.menu(options=self.option_names(),
 				 active=self.active_name())
@@ -80,5 +80,5 @@ class Menu(metaclass=ABCMeta):
 	def quit(self):
 		if self.parent:
 			self.controls.unsubscribe()
-			self.parent.subscribe()
+			self.parent.take_control()
 			self.parent.show()
