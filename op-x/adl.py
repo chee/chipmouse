@@ -5,24 +5,6 @@ from time import sleep
 
 from enum import Enum
 
-class Program():
-	_value = 0x00
-	changed = False
-	def inc(self):
-		self._value += 0x01
-		if self._value > 0xff:
-			self._value = 0x00
-		self.changed = True
-	def dec(self):
-		self._value -= 0x01
-		if self._value < 0x00:
-			self._value = 0xff
-		self.changed = True
-
-	def value(self):
-		self.changed = False
-		return self._value
-
 class AdlType(Enum):
 	adl = 'adl'
 	opn = 'opn'

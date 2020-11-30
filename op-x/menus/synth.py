@@ -44,13 +44,17 @@ class Voice:
 class Synth():
 	NOTEON = 0x9
 	NOTEOFF = 0x8
-	attack = 0.01
-	release = 0.2
 	fs = 0
 	client: Optional[jack.Client] = None
 	notes = []
-	frequency = 440
+	frequency = 440.0
 	playing = False
+	detune = 0.9
+	factor = 2.0
+	oper = operator.add
+	@property
+	def fm(self):
+		return self.frequency - self.detune
 	@property
 	def outport(self) -> jack.OwnPort:
 		return self.client.outports[0]
@@ -80,6 +84,7 @@ class Synth():
 		client.activate()
 	def quit(self):
 		self.client.deactivate()
+		self.client.close()
 	def process(self, blocksize):
 		for offset, data in self.inport.incoming_midi_events():
 			if len(data) == 3:
@@ -97,25 +102,23 @@ class Synth():
 							self.frequency = m2f(self.notes[-1])
 					else:
 						self.playing = False
-				else:
-					pass  # ignore
-			else:
-				pass  # ignore
 
 		buf = self.outport.get_array()
 		buf.fill(0)
 		t = (np.arange(blocksize) + self.client.last_frame_time) / self.fs
-		signal = np.sin(2 * np.pi * self.frequency * t)
+		carrier = np.sin(2 * np.pi * self.frequency * t)
+		mod = np.sin(2 * np.pi * (self.fm * self.factor) * t)
+		signal = np.cos(self.oper(carrier, mod))
 		if self.playing:
-			buf += signal / 127
+			buf += signal * 0.6
 
 	def samplerate(self, samplerate):
 		self.fs = samplerate
 
 class SynthMenu(ValueMenu):
 	name = "synth"
-	cyan = CyanMenuValue("dogness", 0)
-	yellow = YellowMenuValue("wideness", 0)
+	cyan = CyanMenuValue("dogness", 50)
+	yellow = YellowMenuValue("wideness", 2)
 	blue = BlueMenuValue("averageness", 0)
 	green = GreenMenuValue("amount", 20)
 	synth: Optional[Synth] = None
@@ -137,10 +140,13 @@ class SynthMenu(ValueMenu):
 		self.synth = Synth()
 		print(self.synth)
 	def cyan_change(self):
+		self.synth.factor = self.cyan.value / 25
 		pass
 	def yellow_change(self):
+		self.synth.detune = self.yellow.value / 20
 		pass
 	def green_change(self):
+		self.synth.oper = operator.mul if self.green.value > 50 else operator.add
 		pass
 	def blue_change(self):
 		pass

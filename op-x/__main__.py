@@ -31,10 +31,10 @@ else:
 controls = Controls(args.mode)
 screen = Screen(args.mode)
 menu = MainMenu([
+	SynthMenu(),
 	OpnMenu(),
 	AdlMenu(),
 	BackupMenu(),
-	SynthMenu(),
 	SpeakMenu()
 ])
 
