@@ -28,10 +28,10 @@ class BackupMenu(Menu):
 	@property
 	def target(self):
 		today = datetime.today()
-		return today.strftime(f"/tmp/op-2/%y.%m.%d.%H.%M.%S_%A-{self.day_segment(today)}").lower()
+		return today.strftime(f"~/op-1/backup/%y.%m.%d.%H.%M.%S_%A-{self.day_segment(today)}").lower()
 	@property
 	def op1disk(self):
-		return "/tmp/op-1"
+		return "~/op-1/disk"
 	def ignore(self, dirpath: str, filenames: List[str]):
 		if dirpath == self.op1disk + "/drum" or dirpath == self.op1disk + "/synth":
 			return filter(lambda name : name == "user" or name == "snapshot", filenames)
