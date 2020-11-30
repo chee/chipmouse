@@ -1,14 +1,11 @@
 from typing import Optional
-from ..controls import Control
-from ..menu import Menu, Option, MenuWithSubmenus, ValueMenu
+from ..menu import ValueMenu
 from ..menu import CyanMenuValue, YellowMenuValue, GreenMenuValue, BlueMenuValue
-import jack
+from ..jack import JackClient
 import numpy as np
 import operator
-import math
 
 def m2f(note):
-	print(2 ** ((note - 69) / 12) * 440)
 	return 2 ** ((note - 69) / 12) * 440
 
 class Voice:
@@ -41,52 +38,27 @@ class Voice:
 				self.weight = self.target_weight
 				self.weight_step = 0
 
-class Synth():
+class Synth(JackClient):
+	jack_client_name = "op-x.ynth"
 	NOTEON = 0x9
 	NOTEOFF = 0x8
-	fs = 0
-	client: Optional[jack.Client] = None
 	notes = []
 	frequency = 440.0
 	playing = False
 	detune = 0.9
 	factor = 2.0
-	oper = operator.add
+	_op = operator.add
 	@property
 	def fm(self):
 		return self.frequency - self.detune
-	@property
-	def outport(self) -> jack.OwnPort:
-		return self.client.outports[0]
-	@property
-	def inport(self) -> jack.OwnMidiPort:
-		return self.client.midi_inports[0]
 	def __init__(self):
-		client = self.client = jack.Client("op-x")
-		client.midi_inports.register("operator")
-		client.outports.register(f"notes")
-		midi_out = client.get_ports(is_midi=True, is_input=False)
-		speakers = client.get_ports(is_physical=True, is_input=True, is_audio=True)
-
-		self.op1_out = None
-
-		for port in midi_out:
-			if "OP-1" in port.name:
-				self.op1_out = port
-				break
-
-		self.client.connect(self.op1_out, self.inport)
-		for speaker in speakers:
-			client.connect(self.outport, speaker)
-
-		client.set_samplerate_callback(self.samplerate)
-		client.set_process_callback(self.process)
-		client.activate()
+		self.register_jack_client(midi_in=["keys"], audio_out=["sounds"])
+		self.connect_speakers_to(self.audio_out)
+		self.connect_all_midi_to(self.midi_in)
 	def quit(self):
-		self.client.deactivate()
-		self.client.close()
-	def process(self, blocksize):
-		for offset, data in self.inport.incoming_midi_events():
+		self.deactivate_jack_client()
+	def jack_process_callback(self, blocksize):
+		for offset, data in self.midi_in[0].incoming_midi_events():
 			if len(data) == 3:
 				status, pitch, vel = bytes(data)
 				# MIDI channel number is ignored!
@@ -103,17 +75,14 @@ class Synth():
 					else:
 						self.playing = False
 
-		buf = self.outport.get_array()
+		buf = self.audio_out[0].get_array()
 		buf.fill(0)
-		t = (np.arange(blocksize) + self.client.last_frame_time) / self.fs
+		t = (np.arange(blocksize) + self.jack_client.last_frame_time) / self.samplerate
 		carrier = np.sin(2 * np.pi * self.frequency * t)
 		mod = np.sin(2 * np.pi * (self.fm * self.factor) * t)
-		signal = np.cos(self.oper(carrier, mod))
+		signal = np.cos(carrier + mod)
 		if self.playing:
-			buf += signal * 0.6
-
-	def samplerate(self, samplerate):
-		self.fs = samplerate
+			buf += signal
 
 class SynthMenu(ValueMenu):
 	name = "synth"
@@ -146,7 +115,6 @@ class SynthMenu(ValueMenu):
 		self.synth.detune = self.yellow.value / 20
 		pass
 	def green_change(self):
-		self.synth.oper = operator.mul if self.green.value > 50 else operator.add
 		pass
 	def blue_change(self):
 		pass
