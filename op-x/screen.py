@@ -1,4 +1,3 @@
-from tkinter.constants import TOP
 from PIL import Image, ImageDraw
 from .mode import Mode
 import textwrap
@@ -32,6 +31,7 @@ class Screen():
 			self.height = 240
 			from . import tkroot
 			import tkinter
+			from tkinter.constants import TOP
 			self.canvas = tkinter.Canvas(tkroot, width=self.width, height=self.height)
 			self.canvas.pack()
 	def show(self, image: Image.Image, hint=False):

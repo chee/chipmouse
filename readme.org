@@ -19,3 +19,35 @@ Requirements:
 
 #+caption: an early gif of menu action
 [[file:./assets/menu1.gif]]
+
+** service files
+
+*** ~/.config/systemd/user/a2jmidid.service
+
+#+begin_src conf :tangle ~/.config/systemd/user/a2jmidid.service
+[Unit]
+Description=alsa to jack midi bridge daemon
+After=jackd.service
+
+[Install]
+WantedBy=default.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/bin/a2jmidid -e
+#+end_src
+
+*** ~/.config/systemd/user/jackd.service
+#+begin_src conf :tangle ~/.config/systemd/user/jackd.service
+[Unit]
+Description=Jack audio server
+
+[Install]
+WantedBy=default.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/bin/jackd -d alsa -r 24000 -p 1024 -n 2
+#+end_src
