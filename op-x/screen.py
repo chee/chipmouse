@@ -1,6 +1,7 @@
 from PIL import Image, ImageDraw
 from .mode import Mode
 import textwrap
+from .op1_status import Op1Status
 
 class Colors():
 	black = (0x00, 0x00, 0x00)
@@ -12,6 +13,8 @@ class Screen():
 	margin = 10
 	colors = Colors()
 	def __init__(self, mode):
+		self.op1 = Op1Status()
+		self.op1.start(error=self.error)
 		self.mode = mode
 		if mode is Mode.PI:
 			from ST7789 import ST7789, BG_SPI_CS_FRONT
@@ -21,7 +24,6 @@ class Screen():
 				cs=1,
 				dc=9,
 				backlight=13,
-				# TODO ???
 				spi_speed_hz=80 * 1000 * 1000
 			)
 			self.width = self.st7789.width
@@ -38,6 +40,10 @@ class Screen():
 	def show(self, image: Image.Image, hint=False):
 		if not hint:
 			self.current_image = image
+		if self.op1.connected:
+			   ImageDraw.Draw(image).ellipse((220, 220, 230, 230), fill=(0, 255, 0))
+		else:
+			   ImageDraw.Draw(image).ellipse((220, 220, 230, 230), fill=(255, 0, 0))
 		if self.mode is Mode.COMPUTER:
 			from tkinter import NW
 			from PIL import ImageTk

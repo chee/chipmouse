@@ -1,7 +1,7 @@
 from typing import Optional
 from ..menu import ValueMenu
 from ..menu import CyanMenuValue, YellowMenuValue, GreenMenuValue, BlueMenuValue
-from ..jack import JackClient
+from ..jack_client import JackClient
 import numpy as np
 import operator
 

@@ -1,6 +1,6 @@
 from typing import Optional
 from ..menu import Option, Menu
-from ..jack import JackClient
+from ..jack_client import JackClient
 
 class Thru(JackClient):
 	jack_client_name = "op-x.thru"
