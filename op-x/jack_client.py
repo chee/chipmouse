@@ -49,7 +49,10 @@ class JackClient(metaclass=ABCMeta):
 		self.jack_client.activate()
 	def deactivate_jack_client(self):
 		for src, dst in self.jack_connections:
-			self.jack_client.disconnect(src, dst)
+			try:
+				self.jack_client.disconnect(src, dst)
+			except:
+				print(f"didn't disconnect {src} from {dst}")
 		self.jack_client.deactivate()
 		self.jack_client.close()
 		self.jack_client = None
