@@ -6,6 +6,7 @@ import argparse
 from .controls import Controls
 from .screen import Screen
 from .mode import Mode
+import signal
 
 parser = argparse.ArgumentParser()
 
@@ -26,7 +27,7 @@ if args.mode is Mode.COMPUTER:
 else:
 	def loop():
 		while True:
-			pass
+			signal.pause()
 
 controls = Controls(args.mode)
 screen = Screen(args.mode)
