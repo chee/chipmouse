@@ -85,9 +85,6 @@ class Menu(metaclass=ABCMeta):
 	def handle_control_down(self, control):
 		if control is Control.menu_active:
 			self.screen.overlay_menu_hint()
-	def handle_control_up(self, control):
-		if control is Control.menu_active:
-			self.screen.remove_menu_hint()
 		if control is Control.menu_next:
 			self.inc()
 			self.show()
@@ -98,6 +95,10 @@ class Menu(metaclass=ABCMeta):
 		if control is Control.menu_yes:
 			self.screen.overlay_menu_hint()
 			self.select(self.options[self.active] if self.options else None)
+	def handle_control_up(self, control):
+		print("handling {control}")
+		if control is Control.menu_active:
+			self.screen.remove_menu_hint()
 	def option_names(self):
 		if not self.options:
 			return None

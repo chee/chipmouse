@@ -34,7 +34,7 @@ class Controls():
 		}
 	}
 	buttons = {
-		5:  Control.top_left,
+		5: Control.top_left,
 		6:  Control.bottom_left,
 		16: Control.top_right,
 		24: Control._bottom_right
@@ -60,28 +60,48 @@ class Controls():
 		self.mode = mode
 		if mode is Mode.PI:
 			import RPi.GPIO as io
+			self.io = io
 			buttons = self.buttons
 			io.setmode(io.BCM)
-			io.setup(buttons.keys(), io.IN, pull_up_down=io.PUD_UP)
-			for pin, control in buttons.items():
-				# TODO move lambdapodes to self.button_down, self.button_up
-				io.add_event_detect(pin, io.RISING, lambda: self.down(control), bouncetime=1000)
-				io.add_event_detect(pin, io.FALLING, lambda: self.up(control), bouncetime=1000)
+			io.setup(list(buttons.keys()), io.IN, pull_up_down=io.PUD_UP)
+			for pin, _ in buttons.items():
+				io.add_event_detect(pin, io.BOTH, lambda pin: self.gpio(pin), bouncetime=1000)
 		if mode is Mode.COMPUTER:
 			from . import tkroot
 			tkroot.bind("<KeyPress>", self.key_down)
 			tkroot.bind("<KeyRelease>", self.key_up)
 	def key_down(self, key):
+		print(f"down {key}")
 		if key.char in self.keys:
 			self.down(self.keys[key.char])
 	def key_up(self, key):
+		print(f"up {key}")
 		if key.keysym in self.keys:
 			self.up(self.keys[key.keysym])
+	def gpio(self, pin: int):
+		control = self.buttons[pin]
+		io = self.io
+		state = io.input(pin)
+		print(f"pin {pin}, control {control}, state {state}, high {io.HIGH}, low {io.LOW}")
+		if state == io.HIGH:
+			print("up")
+			self.up(control)
+		else:
+			print("down")
+			self.down(control)
 	def down(self, control: Control):
 		if control is Control._bottom_right:
 			self.level = Level.menu
 			if self.down_callback:
 				self.down_callback(Control.menu_active)
+		elif self.level is Level.menu:
+			if control is Control.top_left:
+				self.down_callback(Control.menu_exit)
+			if control is Control.top_right:
+				self.down_callback(Control.menu_yes)
+			if control is Control.bottom_left:
+				self.down_callback(Control.menu_next)
+				print("sending menu next")
 		elif self.down_callback:
 			self.down_callback(control)
 	def up(self, control: Control):
@@ -91,13 +111,6 @@ class Controls():
 				self.up_callback(Control.menu_active)
 		if self.up_callback is None:
 			return
-		if self.level is Level.menu:
-			if control is Control.top_left:
-				self.up_callback(Control.menu_exit)
-			if control is Control.top_right:
-				self.up_callback(Control.menu_yes)
-			if control is Control.bottom_left:
-				self.up_callback(Control.menu_next)
 		else:
 			self.up_callback(control)
 	def take(self, down_callback, up_callback):

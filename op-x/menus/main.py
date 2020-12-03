@@ -7,9 +7,10 @@ class MainMenu(MenuWithSubmenus):
         name = "main"
         quit_counter = 0
         def handle_control_up(self, control):
+                super().handle_control_up(control)
                 if control is not Control.menu_exit:
                         self.quit_counter = 0
-        def quit():
+        def quit(self):
                 super().quit()
                 quit_counter += 1
                 if quit_counter == 4:
