@@ -26,6 +26,7 @@ class Screen():
 			)
 			self.width = self.st7789.width
 			self.height = self.st7789.height
+			self.st7789.begin()
 		if mode is Mode.COMPUTER:
 			self.width = 240
 			self.height = 240
