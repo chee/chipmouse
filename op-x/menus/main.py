@@ -12,6 +12,6 @@ class MainMenu(MenuWithSubmenus):
                         self.quit_counter = 0
         def quit(self):
                 super().quit()
-                quit_counter += 1
-                if quit_counter == 4:
-                        system("halt")
+                self.quit_counter += 1
+                if self.quit_counter == 4:
+                        system("sudo halt")

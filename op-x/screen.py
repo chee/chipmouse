@@ -14,7 +14,7 @@ class Screen():
 	def __init__(self, mode):
 		self.mode = mode
 		if mode is Mode.PI:
-			from ST7789 import ST7789
+			from ST7789 import ST7789, BG_SPI_CS_FRONT
 			self.st7789 = ST7789(
 				rotation=90,
 				port=0,
