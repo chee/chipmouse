@@ -89,14 +89,14 @@ class Controls():
 			if self.down_callback:
 				self.down_callback(Control.menu_active)
 		elif self.level is Level.menu:
-			if control is Control.top_left:
-				self.down_callback(Control.menu_exit)
 			if control is Control.top_right:
+				self.down_callback(Control.menu_exit)
+			if control is Control.top_left:
 				self.down_callback(Control.menu_yes)
 			if control is Control.bottom_left:
 				self.down_callback(Control.menu_next)
-			elif self.down_callback:
-				self.down_callback(control)
+		elif self.down_callback:
+			self.down_callback(control)
 	def up(self, control: Control):
 		if control is Control._bottom_right and self.level is Level.menu:
 			self.level = Level.default
