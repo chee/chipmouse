@@ -24,8 +24,8 @@ class AdlProcess(JackClient):
         def write_midi(self, event):
                 return self.midi_out[0].write_midi_event(0, event)
         def start(self, error):
-                self.process = subprocess.Popen(self.command, stdout=PIPE)
-                sleep(1)
+                self.process = subprocess.Popen(self.command, stdout=PIPE, env={'TERM': 'xterm'})
+                sleep(3)
                 self.register_jack_client(midi_out=["program-change"])
                 adl_in = list(filter(lambda port : "ADLrt" in port.name,
                                      self.jack_client.get_ports(is_midi=True, is_input=True)))
