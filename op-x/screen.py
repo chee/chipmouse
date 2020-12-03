@@ -43,9 +43,13 @@ class Screen():
 			from PIL import ImageTk
 			self.tkimage = ImageTk.PhotoImage(image)
 			self._image = self.canvas.create_image(0, 0, anchor=NW, image=self.tkimage)
+			from tkinter.constants import TOP
 			self.canvas.pack(side=TOP, expand=True)
 		if self.mode is Mode.PI:
 			self.st7789.display(image)
+	def file(self, name):
+		image = Image.open(f"./op-x/images/{name}")
+		self.show(image)
 	def overlay_text(self, text):
 		image = self.current_image.copy()
 		ImageDraw.Draw(image).text(xy=(0, self.height - self.text_height),
@@ -93,7 +97,12 @@ class Screen():
 			color = self.colors.white
 			if option == active:
 				color = self.colors.black
-				ImageDraw.Draw(image).rectangle(((0, y), (self.width, y + self.text_height)), self.colors.white)
+				ImageDraw.Draw(image).rectangle(
+					(
+						(0, y),
+						(self.width, y + self.text_height)
+					),
+					self.colors.white)
 			ImageDraw.Draw(image).text(xy=xy,
 						   text=option,
 						   fill=color)

@@ -107,7 +107,6 @@ class SynthMenu(ValueMenu):
 		])
 	def start(self):
 		self.synth = Synth()
-		print(self.synth)
 	def cyan_change(self):
 		self.synth.factor = self.cyan.value / 25
 		pass

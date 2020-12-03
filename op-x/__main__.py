@@ -3,6 +3,7 @@
 # the code below will go under the adl/opn menu, which will also launch adlrt
 
 import argparse
+from .system import System
 from .controls import Controls
 from .screen import Screen
 from .mode import Mode
@@ -10,7 +11,10 @@ import signal
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("-m", "--mode", type=Mode, choices=Mode, required=True)
+parser.add_argument("-m", "--mode",
+		    type=Mode,
+		    choices=Mode,
+		    required=True)
 
 args = parser.parse_args()
 
@@ -19,6 +23,7 @@ from .menus.main import MainMenu
 from .menus.adl import AdlMenu, OpnMenu
 from .menus.speak import SpeakMenu
 from .menus.synth import SynthMenu
+from .menus.thru import ThruMenu
 
 if args.mode is Mode.COMPUTER:
 	from . import tkroot
@@ -31,16 +36,20 @@ else:
 
 controls = Controls(args.mode)
 screen = Screen(args.mode)
+system = System(args.mode, screen=screen)
 menu = MainMenu([
 	SynthMenu(),
 	OpnMenu(),
 	AdlMenu(),
 	BackupMenu(),
-	SpeakMenu()
+	SpeakMenu(),
+	ThruMenu()
 ])
 
 menu.set_platform(controls=controls,
-		  screen=screen)
+		  screen=screen,
+		  system=system)
+
 menu.take_control()
 menu.show()
 loop()

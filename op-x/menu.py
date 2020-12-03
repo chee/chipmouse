@@ -1,6 +1,7 @@
 from abc import abstractmethod, ABCMeta
 from typing import List, Optional, Dict
 from .screen import Screen
+from .system import System
 from .controls import Controls, Control, Level
 from typing import TypeVar, Generic
 
@@ -38,7 +39,17 @@ class Menu(metaclass=ABCMeta):
 	parent: Optional['Menu'] = None
 	_screen: Optional[Screen] = None
 	_controls: Optional[Controls] = None
+	_system: Optional[System] = None
 	name = "abstract menu"
+
+	@property
+	def system(self):
+		if self._system:
+			return self._system
+		elif self.parent:
+			return self.parent.system
+		else:
+			raise RuntimeError("no parent, no system")
 
 	@property
 	def screen(self):
@@ -62,9 +73,10 @@ class Menu(metaclass=ABCMeta):
 		self.options = options
 		self.active = 0
 
-	def set_platform(self, screen, controls):
+	def set_platform(self, screen, controls, system):
 		self._screen = screen
 		self._controls = controls
+		self._system = system
 
 	def inc(self):
 		if not self.options:
@@ -94,9 +106,8 @@ class Menu(metaclass=ABCMeta):
 			self.screen.overlay_menu_hint()
 		if control is Control.menu_yes:
 			self.screen.overlay_menu_hint()
-			self.select(self.options[self.active] if self.options else None)
+			self.select(self.active_option)
 	def handle_control_up(self, control):
-		print("handling {control}")
 		if control is Control.menu_active:
 			self.screen.remove_menu_hint()
 	def option_names(self):

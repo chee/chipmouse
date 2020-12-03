@@ -45,17 +45,6 @@ class Controls():
 		'a': Control.bottom_left,
 		's': Control._bottom_right
 	}
-	def name_for(self, control: Control):
-		names = self.names[self.mode]
-		if control in names:
-			return names[control]
-		if control is Control.menu_exit:
-			return f"{names[Control._bottom_right]} and {names[Control.top_left]}"
-		if control is Control.menu_yes:
-			return f"{names[Control._bottom_right]} and {names[Control.top_right]}"
-		if control is Control.menu_next:
-			return f"{names[Control._bottom_right]} and {names[Control.bottom_left]}"
-
 	def __init__(self, mode):
 		self.mode = mode
 		if mode is Mode.PI:
@@ -70,24 +59,29 @@ class Controls():
 			from . import tkroot
 			tkroot.bind("<KeyPress>", self.key_down)
 			tkroot.bind("<KeyRelease>", self.key_up)
+	def name_for(self, control: Control):
+		names = self.names[self.mode]
+		if control in names:
+			return names[control]
+		if control is Control.menu_exit:
+			return f"{names[Control._bottom_right]} and {names[Control.top_left]}"
+		if control is Control.menu_yes:
+			return f"{names[Control._bottom_right]} and {names[Control.top_right]}"
+		if control is Control.menu_next:
+			return f"{names[Control._bottom_right]} and {names[Control.bottom_left]}"
 	def key_down(self, key):
-		print(f"down {key}")
 		if key.char in self.keys:
 			self.down(self.keys[key.char])
 	def key_up(self, key):
-		print(f"up {key}")
 		if key.keysym in self.keys:
 			self.up(self.keys[key.keysym])
 	def gpio(self, pin: int):
 		control = self.buttons[pin]
 		io = self.io
 		state = io.input(pin)
-		print(f"pin {pin}, control {control}, state {state}, high {io.HIGH}, low {io.LOW}")
 		if state == io.HIGH:
-			print("up")
 			self.up(control)
 		else:
-			print("down")
 			self.down(control)
 	def down(self, control: Control):
 		if control is Control._bottom_right:
@@ -101,9 +95,8 @@ class Controls():
 				self.down_callback(Control.menu_yes)
 			if control is Control.bottom_left:
 				self.down_callback(Control.menu_next)
-				print("sending menu next")
-		elif self.down_callback:
-			self.down_callback(control)
+			elif self.down_callback:
+				self.down_callback(control)
 	def up(self, control: Control):
 		if control is Control._bottom_right and self.level is Level.menu:
 			self.level = Level.default
