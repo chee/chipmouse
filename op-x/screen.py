@@ -1,4 +1,4 @@
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 from .mode import Mode
 import textwrap
 from .op1_status import Op1Status
@@ -9,9 +9,10 @@ class Colors():
 
 class Screen():
 	current_image = None
-	text_height = 10
+	text_height = 24
 	margin = 10
 	colors = Colors()
+	font = ImageFont.load("./op-x/fonts/terx24n.pil")
 	def __init__(self, mode):
 		self.op1 = Op1Status()
 		self.op1.start(error=self.error)
@@ -60,6 +61,7 @@ class Screen():
 		image = self.current_image.copy()
 		ImageDraw.Draw(image).text(xy=(0, self.height - self.text_height),
 					   text=text,
+					   font=self.font,
 					   fill=(100, 200, 250))
 		self.show(image, hint=True)
 	def overlay_menu_hint(self):
@@ -90,6 +92,7 @@ class Screen():
 		wrapped_text = "\n".join(textwrap.wrap(text, width=self.width // 6))
 		ImageDraw.Draw(image).text(xy=xy,
 					   text=wrapped_text,
+					   font=self.font,
 					   fill=color)
 		return self.show(image)
 	def error(self, text):
@@ -111,6 +114,7 @@ class Screen():
 					self.colors.white)
 			ImageDraw.Draw(image).text(xy=xy,
 						   text=option,
+						   font=self.font,
 						   fill=color)
 			index += 1
 		return self.show(image)
