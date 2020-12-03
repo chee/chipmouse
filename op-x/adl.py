@@ -13,12 +13,13 @@ class AdlProcess(JackClient):
         jack_client_name = "op-x.sega"
         def __init__(self, type=AdlType.adl):
                 self.type = type
+                command = ["adlrt", "-A", "jack", "-M", "alsa"]
                 if type is AdlType.adl:
-                        self.command = ["adlrt", "-p", "ADLMIDI"]
+                        self.command = command + ["-p", "ADLMIDI"]
                 elif type is AdlType.opn:
-                        self.command = ["adlrt", "-p", "OPNMIDI"]
+                        self.command = command + ["-p", "OPNMIDI", "-e", "2"]
                 else:
-                        self.command = ["adlrt"]
+                        self.command = command
 
         def write_midi(self, event):
                 return self.midi_out[0].write_midi_event(0, event)
