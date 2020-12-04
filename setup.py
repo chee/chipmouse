@@ -4,14 +4,14 @@ with open("readme.org", "r") as fh:
 	long_description = fh.read()
 
 setuptools.setup(
-	name="op-x-chee",
+	name="chipmouse-chee",
 	version="0.0.0",
 	author="chee",
 	author_email="chee@snoot.club",
 	description="a companion to the op-1",
 	long_description=long_description,
 	long_description_content_type="text/org",
-	url="https://git.snoot.club/chee/op-x",
+	url="https://git.snoot.club/chee/chipmouse",
 	packages=setuptools.find_packages(),
 	python_requires=">= 3.6",
 	entry_points={

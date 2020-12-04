@@ -1,4 +1,4 @@
-* op-x
+* chipmouse
 
 Requirements:
 
@@ -34,20 +34,20 @@ WantedBy=default.target
 
 [Service]
 Type=simple
-Restart=always
 ExecStart=/bin/a2jmidid -e
 #+end_src
 
 *** ~/.config/systemd/user/jackd.service
 #+begin_src conf :tangle ~/.config/systemd/user/jackd.service
-[Unit]
-Description=Jack audio server
+  [Unit]
+  Description=Jack audio server
+  After=sound.target
 
-[Install]
-WantedBy=default.target
+  [Install]
+  WantedBy=default.target
 
-[Service]
-Type=simple
-Restart=always
-ExecStart=/usr/bin/jackd -d alsa -r 24000 -p 1024 -n 2
+  [Service]
+  Type=simple
+  Restart=always
+  ExecStart=/usr/bin/jackd -d alsa -r 24000 -p 1024 -n 2
 #+end_src

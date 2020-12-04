@@ -39,7 +39,7 @@ class Voice:
 				self.weight_step = 0
 
 class Synth(JackClient):
-	jack_client_name = "op-x.ynth"
+	jack_client_name = "chipmouse.ynth"
 	NOTEON = 0x9
 	NOTEOFF = 0x8
 	notes = []

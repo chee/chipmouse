@@ -3,7 +3,7 @@ from ..menu import Option, Menu
 from ..jack_client import JackClient
 
 class Thru(JackClient):
-	jack_client_name = "op-x.thru"
+	jack_client_name = "chipmouse.thru"
 	def start(self):
 		self.register_jack_client()
 		ins = self.jack_client.get_ports(is_midi=True, is_input=True)

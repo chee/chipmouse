@@ -10,7 +10,7 @@ class AdlType(Enum):
 	opn = 'opn'
 
 class AdlProcess(JackClient):
-	jack_client_name = "op-x.sega"
+	jack_client_name = "chipmouse.sega"
 	def __init__(self, type=AdlType.adl):
 		self.type = type
 		command = ["adlrt", "-A", "jack", "-M", "alsa"]

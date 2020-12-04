@@ -4,7 +4,7 @@ from .jack_client import JackClient
 from enum import Enum
 
 class Op1Status(JackClient):
-	jack_client_name = "op-x.watcher"
+	jack_client_name = "chipmouse.watcher"
 	def start(self, error):
 		self.register_jack_client()
 	def stop(self):

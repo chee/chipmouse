@@ -12,7 +12,7 @@ class Screen():
 	text_height = 24
 	margin = 10
 	colors = Colors()
-	font = ImageFont.load("./op-x/fonts/terx24n.pil")
+	font = ImageFont.load("./chipmouse/fonts/terx24n.pil")
 	def __init__(self, mode):
 		self.op1 = Op1Status()
 		self.op1.start(error=self.error)
@@ -55,7 +55,7 @@ class Screen():
 		if self.mode is Mode.PI:
 			self.st7789.display(image)
 	def file(self, name):
-		image = Image.open(f"./op-x/images/{name}")
+		image = Image.open(f"./chipmouse/images/{name}")
 		self.show(image)
 	def overlay_text(self, text):
 		image = self.current_image.copy()
