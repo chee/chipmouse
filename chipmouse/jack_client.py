@@ -1,6 +1,8 @@
 from abc import ABCMeta, abstractmethod
+from itertools import zip_longest
 from typing import List, Optional
 import jack
+import itertools
 
 class JackClient(metaclass=ABCMeta):
 	jack_connections = []
@@ -70,17 +72,22 @@ class JackClient(metaclass=ABCMeta):
 	def connect_speakers_to(self, src=[]):
 		if len(src) == 0:
 			raise RuntimeError("need at least one source")
-		elif len(src) == 1:
+		elif len(src) % 2 == 1:
 			for speaker in self.jack_speakers:
-				try:
-					self.jack_client.connect(src[0], speaker)
-				except:
-					print(f"didn't connect {src[0]} to {speaker}")
-		elif len(src) == 2:
-			for src, dst in zip(src, self.jack_speakers):
-				try:
-					self.jack_client.connect(src, dst)
-				except:
-					print(f"didn't connect {src} to {dst}")
-		elif len(src) > 2:
-			raise RuntimeError(f"too many src ({len(src)}), don't know what you want.")
+				for source in src:
+					try:
+						self.jack_client.connect(source, speaker)
+					except:
+						print(f"didn't connect {source} to {speaker}")
+		else:
+			pairs = grouper(2, src)
+			for pair in pairs:
+				for src, dst in zip(pair, self.jack_speakers):
+					try:
+						self.jack_client.connect(src, dst)
+					except:
+						print(f"didn't connect {src} to {dst}")
+
+def grouper(n, iterable):
+    args = [iter(iterable)] * n
+    return zip_longest(*args)

@@ -24,6 +24,8 @@ from .menus.adl import AdlMenu, OpnMenu
 from .menus.speak import SpeakMenu
 from .menus.synth import SynthMenu
 from .menus.thru import ThruMenu
+from .menus.beat import BeatMenu
+from .menus.cc import CcMenu
 
 if args.mode is Mode.COMPUTER:
 	from . import tkroot
@@ -38,12 +40,14 @@ controls = Controls(args.mode)
 screen = Screen(args.mode)
 system = System(args.mode, screen=screen)
 menu = MainMenu([
+	CcMenu(),
+	SynthMenu(),
 	OpnMenu(),
 	AdlMenu(),
 	ThruMenu(),
-	SynthMenu(),
 	BackupMenu(),
 	SpeakMenu(),
+	BeatMenu()
 ])
 
 menu.set_platform(controls=controls,

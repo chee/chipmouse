@@ -1,6 +1,6 @@
 from ..controls import Control
 from ..menu import Menu, Option, MenuWithSubmenus, ValueMenu
-from ..menu import CyanMenuValue, YellowMenuValue, GreenMenuValue, BlueMenuValue
+from ..menu import BlueMenuValue, GreenMenuValue, WhiteMenuValue, OrangeMenuValue
 import pyo
 from pyo import *
 from random import random
@@ -42,20 +42,20 @@ class Synth:
 
 class PyoSynthMenu(ValueMenu):
 	name = "synth"
-	cyan = CyanMenuValue("dogness", 0)
-	yellow = YellowMenuValue("wideness", 0)
-	blue = BlueMenuValue("averageness", 0)
-	green = GreenMenuValue("amount", 20)
+	blue = BlueMenuValue("dogness", 0)
+	green = GreenMenuValue("wideness", 0)
+	orange = OrangeMenuValue("averageness", 0)
+	white = WhiteMenuValue("amount", 20)
 	def __init__(self):
-		self.cyan.sub(self.cyan_change)
-		self.cyan.sub(self.yellow_change)
-		self.cyan.sub(self.blue_change)
-		self.cyan.sub(self.green_change)
+		self.blue.sub(self.blue_change)
+		self.blue.sub(self.green_change)
+		self.orange.sub(self.orange_change)
+		self.blue.sub(self.white_change)
 		super().__init__(options=[
-			self.cyan,
-			self.yellow,
 			self.blue,
-			self.green
+			self.green,
+			self.orange,
+			self.white
 		])
 	def start(self):
 		try:
@@ -76,14 +76,14 @@ class PyoSynthMenu(ValueMenu):
 		# It's very easy to double the synth sound!
 		# One octave lower and directly sent to the audio output.
 		self.synth2 = Synth(transpo=0.5, mul=0.7).out()
-	def cyan_change(self):
-		self.synth.osc1._sharp = self.cyan.value / 100
-	def yellow_change(self):
-		self.synth.osc1._sharp = self.yellow.value / 100
-	def green_change(self):
-		self.synth.lfo.range(self.green.value, self.green.value * self.blue.value)
 	def blue_change(self):
-		self.synth.lfo.range(self.green.value, self.green.value * self.blue.value)
+		self.synth.osc1._sharp = self.blue.value / 100
+	def green_change(self):
+		self.synth.osc1._sharp = self.green.value / 100
+	def white_change(self):
+		self.synth.lfo.range(self.white.value, self.white.value * self.blue.value)
+	def orange_change(self):
+		self.synth.lfo.range(self.orange.value, self.orange.value * self.orange.value)
 	def quit(self):
 		self.server.shutdown()
 		del self.server

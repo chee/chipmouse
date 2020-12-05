@@ -147,6 +147,7 @@ class AdlMenu(Menu):
 		super().__init__(instrument_options)
 	def show(self):
 		names = list(self.option_names())
+		# TODO should this code belong to screen? or menu??
 		buffer = self.screen.height // self.screen.text_height // 2
 		low = self.active_value - buffer if self.active_value > buffer else 0
 		high = self.active_value + buffer if self.active_value < (128 - buffer) else 128

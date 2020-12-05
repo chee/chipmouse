@@ -49,7 +49,7 @@ class Thru(JackClient):
 
 
 class Watcher(JackClient):
-	jack_client_name = "chipmouse.watcher"
+	jack_client_name = "chipmouse.thruwatcher"
 	def start(self):
 		self.register_jack_client()
 	def jack_process_callback(self, frame):

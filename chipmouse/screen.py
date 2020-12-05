@@ -1,11 +1,13 @@
 from PIL import Image, ImageDraw, ImageFont
 from .mode import Mode
 import textwrap
-from .op1_status import Op1Status
+from .op1_status import op1
 
 class Colors():
-	black = (0x00, 0x00, 0x00)
-	white = (0xff, 0xff, 0xff)
+	inactive_background = (0x30, 0x30, 0x30)
+	inactive_text = (0xff, 0xff, 0xff)
+	active_background = (0xff, 0xff, 0x00)
+	active_text = (0x00, 0x00, 0x00)
 
 class Screen():
 	current_image = None
@@ -14,7 +16,7 @@ class Screen():
 	colors = Colors()
 	font = ImageFont.load("./chipmouse/fonts/terx24n.pil")
 	def __init__(self, mode):
-		self.op1 = Op1Status()
+		self.op1 = op1
 		self.op1.start(error=self.error)
 		self.mode = mode
 		if mode is Mode.PI:
@@ -80,7 +82,7 @@ class Screen():
 			self.show(self.current_image)
 		else:
 			raise RuntimeError("Somehow there was no current_image when trying to remove menu hint?")
-	def image(self, color=(0x00, 0x00, 0x00)):
+	def image(self, color=colors.inactive_background):
 		return Image.new(mode="RGB",
 				 size=(self.width, self.height),
 				 color=color)
@@ -104,17 +106,17 @@ class Screen():
 		for option in options:
 			y = (index + prev_lines) * self.text_height
 			xy = (self.margin, y)
-			color = self.colors.white
+			color = self.colors.inactive_text
 			lines = textwrap.wrap(option, width=20)
 			prev_lines = len(lines) - 1
 			if option == active:
-				color = self.colors.black
+				color = self.colors.active_text
 				ImageDraw.Draw(image).rectangle(
 					(
 						(0, y),
 						(self.width, (y + (len(lines) * self.text_height)))
 					),
-					self.colors.white)
+					self.colors.active_background)
 			ImageDraw.Draw(image).text(xy=xy,
 						   text="\n".join(lines),
 						   font=self.font,
@@ -130,18 +132,25 @@ class Screen():
 			option = value.name
 			# value is 0 to 100
 			value_width = value.value * self.width // 100
-			y = (index + prev_lines) * self.text_height
+			y = (index + prev_lines) * (self.text_height + 1)
 			x = self.margin
-			text_color = self.colors.white
 			lines = textwrap.wrap(option, width=18)
+			height = (self.text_height + 1) * len(lines)
 			prev_lines = len(lines) - 1
+			text_color = (0x00, 0x00, 0x00)
 			if option == active:
-				text_color = self.colors.black
-				ImageDraw.Draw(image).rectangle(((0, y), (self.width, y + self.text_height)), self.colors.white)
+				ImageDraw.Draw(image).rectangle(
+					((0, y), (self.width, y + height)),
+					self.colors.active_background)
+			else:
+				ImageDraw.Draw(image).rectangle(
+					((0, y), (self.width, y + height)),
+					(0x99, 0x99, 0x99))
 			ImageDraw.Draw(image).rectangle(
-				((0, y), (value_width, y + (self.text_height * len(lines)))),
+				((0, y), (value_width, y + height)),
 				value.color
 			)
+
 			for line_number in range(len(lines)):
 				line = lines[line_number]
 				xy = (x, y + (line_number * self.text_height))

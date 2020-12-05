@@ -143,21 +143,21 @@ class Menu(metaclass=ABCMeta):
 			self.parent.show()
 			self.parent.take_control()
 
-class CyanMenuValue(MenuValue):
+class BlueMenuValue(MenuValue):
 	def __init__(self, name, default=0):
-		super().__init__(name=name, color=(0, 200, 250), default=default)
-
-class YellowMenuValue(MenuValue):
-	def __init__(self, name, default=0):
-		super().__init__(name=name, color=(250, 230, 80), default=default)
+		super().__init__(name=name, color=(0, 100, 250), default=default)
 
 class GreenMenuValue(MenuValue):
 	def __init__(self, name, default=0):
-		super().__init__(name=name, color=(0, 250, 150), default=default)
+		super().__init__(name=name, color=(30, 250, 80), default=default)
 
-class BlueMenuValue(MenuValue):
+class WhiteMenuValue(MenuValue):
 	def __init__(self, name, default=0):
-		super().__init__(name=name, color=(30, 130, 250), default=default)
+		super().__init__(name=name, color=(255, 255, 255), default=default)
+
+class OrangeMenuValue(MenuValue):
+	def __init__(self, name, default=0):
+		super().__init__(name=name, color=(250, 120, 0), default=default)
 
 class ValueMenu(Menu):
 	fine = False
@@ -165,8 +165,6 @@ class ValueMenu(Menu):
 	def __init__(self, options: List[MenuValue]):
 		self.options = options
 		self.active = 0
-		for menu_value in options:
-			menu_value.sub(self.show)
 	def inc_active_option(self):
 		av = self.active_option
 		if not av:
@@ -195,41 +193,51 @@ class ValueMenu(Menu):
 
 
 class FourValueMenu(ValueMenu):
-	cyan_name = "cyan"
-	yellow_name = "yellow"
 	blue_name = "blue"
 	green_name = "green"
-	cyan_default = 0
-	yellow_default = 0
+	orange_name = "orange"
+	white_name = "white"
 	blue_default = 0
+	orange_default = 0
 	green_default = 0
-	def cyan_change(self):
-		pass
-	def yellow_change(self):
-		pass
+	white_default = 0
+	subs = []
 	def blue_change(self):
 		pass
 	def green_change(self):
 		pass
+	def orange_change(self):
+		pass
+	def white_change(self):
+		pass
 	def __init__(self):
-		self.cyan = CyanMenuValue(
-			self.cyan_name, self.cyan_default)
-		self.yellow = YellowMenuValue(
-			self.yellow_name, self.yellow_default)
 		self.blue = BlueMenuValue(
 			self.blue_name, self.blue_default)
 		self.green = GreenMenuValue(
 			self.green_name, self.green_default)
-		self.cyan.sub(self.cyan_change)
-		self.yellow.sub(self.yellow_change)
-		self.blue.sub(self.blue_change)
-		self.green.sub(self.green_change)
+		self.white = WhiteMenuValue(
+			self.white_name, self.white_default)
+		self.orange = OrangeMenuValue(
+			self.orange_name, self.orange_default)
 		super().__init__(options=[
-			self.cyan,
-			self.yellow,
 			self.blue,
-			self.green
+			self.green,
+			self.white,
+			self.orange
 		])
+	def sub(self, color, fn):
+		self.subs.append(color.sub(fn))
+		self.subs.append(color.sub(self.show))
+	def start(self):
+		self.sub(self.blue, self.blue_change)
+		self.sub(self.green, self.green_change)
+		self.sub(self.white, self.white_change)
+		self.sub(self.orange, self.orange_change)
+	def quit(self):
+		for sub in self.subs:
+			sub()
+		self.subs = []
+		super().quit()
 
 
 class MenuWithSubmenus(Menu):

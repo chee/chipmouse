@@ -1,6 +1,6 @@
 from typing import Optional
 from ..menu import FourValueMenu, ValueMenu
-from ..menu import CyanMenuValue, YellowMenuValue, GreenMenuValue, BlueMenuValue
+from ..menu import BlueMenuValue, GreenMenuValue, GreenMenuValue, BlueMenuValue
 from ..jack_client import JackClient
 import numpy as np
 import operator
@@ -87,17 +87,18 @@ class Synth(JackClient):
 class SynthMenu(FourValueMenu):
 	name = "synth"
 	synth: Optional[Synth] = None
-	cyan_name = "factor"
-	cyan_default = 50
-	yellow_name = "detune"
-	yellow_default = 2
+	blue_name = "factor"
+	blue_default = 50
+	green_name = "detune"
+	green_default = 2
 	def start(self):
 		self.synth = Synth()
-	def cyan_change(self):
-		self.synth.factor = self.cyan.value / 25
+		super().start()
+	def blue_change(self):
+		self.synth.factor = self.blue.value / 25
 		pass
-	def yellow_change(self):
-		self.synth.detune = self.yellow.value / 20
+	def green_change(self):
+		self.synth.detune = self.green.value / 20
 		pass
 	def quit(self):
 		self.synth.quit()
