@@ -20,7 +20,10 @@ class CcMenu(FourValueMenu, JackClient):
 	offset = 0
 	def start(self):
 		self.register_jack_client(midi_out=["cc"])
-		self.jack_client.connect(self.midi_out[0], op1.input)
+		try:
+			self.jack_client.connect(self.midi_out[0], op1.input)
+		except:
+			print("no connection to op1, check dot")
 		super().start()
 	def write(self, cc, val):
 		event = [0xb0, cc, (((val * 126) // 100) + 1)]

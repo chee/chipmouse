@@ -111,8 +111,14 @@ class BeatMenu(Menu, JackClient):
 			self.offset += round(self.msg.time * self.samplerate)
 	def start(self):
 		self.register_jack_client(midi_in=["clock"], midi_out=["beat"])
-		self.jack_client.connect(self.op1.output, self.midi_in[0])
-		self.jack_client.connect(self.midi_out[0], self.op1.input)
+		try:
+			self.jack_client.connect(self.op1.output, self.midi_in[0])
+		except:
+			print("didn't connect in to out")
+		try:
+			self.jack_client.connect(self.midi_out[0], self.op1.input)
+		except:
+			print("didn't connect out to in")
 		# self.connect_all_midi_to(self.jack_client.get_ports(is_midi=True, is_input=True))
 		self.active_value()
 		pass
