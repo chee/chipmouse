@@ -55,19 +55,25 @@ class Controls():
 			io.setmode(io.BCM)
 			io.setup(list(buttons.keys()), io.IN, pull_up_down=io.PUD_UP)
 			for pin, _ in buttons.items():
-				io.add_event_detect(pin, io.FALLING, lambda pin: self.gpio(pin), bouncetime=50)
+				io.add_event_detect(pin, io.BOTH, lambda pin: self.gpio(pin), bouncetime=50)
 		if mode is Mode.COMPUTER:
 			from . import tkroot
-			tkroot.bind("<KeyRelease>", self.key)
-	def key(self, key):
-		if key.keysym in self.keys:
-			self.press(self.keys[key.keysym])
+			tkroot.bind("<KeyPress>", self.key_down)
+			tkroot.bind("<KeyRelease>", self.key_up)
+	def key_up(self, event):
+		if event.keysym in self.keys:
+			self.press(self.keys[event.keysym], down=False)
+	def key_down(self, event):
+		if event.keysym in self.keys:
+			self.press(self.keys[event.keysym], down=True)
 	def gpio(self, pin: int):
 		control = self.buttons[pin]
-		self.press(control)
-	def press(self, control: Control):
+		import RPi.GPIO as io
+		state = io.input(pin)
+		self.press(control, down=state == io.LOW)
+	def press(self, control: Control, down=True):
 		if control is Control._bottom_right:
-			if self.level == Level.default:
+			if down:
 				self.level = Level.menu
 				if self.callback:
 					self.callback(Control.menu_on)
@@ -75,14 +81,14 @@ class Controls():
 				self.level = Level.default
 				if self.callback:
 					self.callback(Control.menu_off)
-		elif self.level is Level.menu:
-			if control is Control.top_left:
-				self.callback(Control.menu_exit)
+		elif self.level is Level.menu and down:
 			if control is Control.top_right:
+				self.callback(Control.menu_exit)
+			if control is Control.top_left:
 				self.callback(Control.menu_yes)
 			if control is Control.bottom_left:
 				self.callback(Control.menu_next)
-		elif self.callback:
+		elif self.callback and down:
 			self.callback(control)
 	def take(self, callback):
 		self.callback = callback
