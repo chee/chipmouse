@@ -49,7 +49,6 @@ menu = MainMenu([
 menu.set_platform(controls=controls,
 		  screen=screen,
 		  system=system)
-
 menu.take_control()
 menu.show()
 loop()

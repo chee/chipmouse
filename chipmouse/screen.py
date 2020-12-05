@@ -100,20 +100,23 @@ class Screen():
 	def menu(self, options, active):
 		image = self.image()
 		index = 0
+		prev_lines = 0
 		for option in options:
-			y = index * self.text_height
+			y = (index + prev_lines) * self.text_height
 			xy = (self.margin, y)
 			color = self.colors.white
+			lines = textwrap.wrap(option, width=20)
+			prev_lines = len(lines) - 1
 			if option == active:
 				color = self.colors.black
 				ImageDraw.Draw(image).rectangle(
 					(
 						(0, y),
-						(self.width, y + self.text_height)
+						(self.width, (y + (len(lines) * self.text_height)))
 					),
 					self.colors.white)
 			ImageDraw.Draw(image).text(xy=xy,
-						   text=option,
+						   text="\n".join(lines),
 						   font=self.font,
 						   fill=color)
 			index += 1
@@ -122,23 +125,29 @@ class Screen():
 	def value_menu(self, values, active):
 		image = self.image()
 		index = 0
+		prev_lines = 0
 		for value in values:
 			option = value.name
 			# value is 0 to 100
 			value_width = value.value * self.width // 100
-			y = index * self.text_height
-			xy = (self.margin, y)
+			y = (index + prev_lines) * self.text_height
+			x = self.margin
 			text_color = self.colors.white
+			lines = textwrap.wrap(option, width=18)
+			prev_lines = len(lines)
 			if option == active:
 				text_color = self.colors.black
 				ImageDraw.Draw(image).rectangle(((0, y), (self.width, y + self.text_height)), self.colors.white)
 			ImageDraw.Draw(image).rectangle(
-				((0, y), (value_width, y + self.text_height)),
+				((0, y), (value_width, y + (self.text_height * len(lines)))),
 				value.color
 			)
-			ImageDraw.Draw(image).text(xy=xy,
-						   text=option,
-						   fill=text_color)
+			for line_number in range(len(lines)):
+				line = lines[line_number]
+				xy = (x, y + (line_number * self.text_height))
+				ImageDraw.Draw(image).text(xy=xy, text=line,
+							   fill=text_color,
+							   font=self.font)
 			index += 1
 
 		return self.show(image)

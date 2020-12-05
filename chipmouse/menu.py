@@ -206,6 +206,6 @@ class MenuWithSubmenus(Menu):
 		super().__init__(list(options))
 
 	def select(self, option):
-		option.value.show()
 		option.value.start()
+		option.value.show()
 		option.value.take_control()
