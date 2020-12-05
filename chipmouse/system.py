@@ -22,6 +22,6 @@ class System:
                 ], active="")
                 if self.mode == Mode.PI:
                         system("systemctl restart --user jackd")
-                        system("systemctl restart --user chipmouse")
+                        system("systemctl restart --user CHIPMOUSE")
                 if self.mode == Mode.COMPUTER:
                         print("if you were a pi, jackd and a2jmidid and chipmouse would have been restarten")
