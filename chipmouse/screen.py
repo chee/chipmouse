@@ -14,7 +14,7 @@ class Screen():
 	text_height = 24
 	margin = 10
 	colors = Colors()
-	font = ImageFont.load("./chipmouse/fonts/terx24n.pil")
+	font = ImageFont.load("./chipmouse/fonts/terx24b.pil")
 	def __init__(self, mode):
 		self.op1 = op1
 		self.op1.start(error=self.error)
