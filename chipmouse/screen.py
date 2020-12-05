@@ -71,9 +71,9 @@ class Screen():
 		tl_position = ((0, 0), (width, length))
 		tr_position = ((self.width, 0), (self.width - width, length))
 		bl_position = ((0, self.height - length), (width, self.height))
-		ImageDraw.Draw(image).rectangle(xy=tr_position, fill=(255, 150, 0))
-		ImageDraw.Draw(image).rectangle(xy=tl_position, fill=(0, 255, 50))
-		ImageDraw.Draw(image).rectangle(xy=bl_position, fill=(0, 255, 255))
+		ImageDraw.Draw(image).rectangle(xy=tl_position, fill=(255, 150, 0))
+		ImageDraw.Draw(image).rectangle(xy=tr_position, fill=(30, 255, 50))
+		ImageDraw.Draw(image).rectangle(xy=bl_position, fill=(30, 255, 255))
 		self.show(image, hint=True)
 	def remove_menu_hint(self):
 		if self.current_image:

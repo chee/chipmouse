@@ -94,9 +94,11 @@ class Menu(metaclass=ABCMeta):
 			self.active = number_of_options - 1
 		else:
 			self.active -= 1
-	def handle_control_down(self, control):
-		if control is Control.menu_active:
+	def handle_control(self, control):
+		if control is Control.menu_on:
 			self.screen.overlay_menu_hint()
+		if control is Control.menu_off:
+			self.screen.remove_menu_hint()
 		if control is Control.menu_next:
 			self.inc()
 			self.show()
@@ -107,9 +109,6 @@ class Menu(metaclass=ABCMeta):
 		if control is Control.menu_yes:
 			self.screen.overlay_menu_hint()
 			self.select(self.active_option)
-	def handle_control_up(self, control):
-		if control is Control.menu_active:
-			self.screen.remove_menu_hint()
 	def option_names(self):
 		if not self.options:
 			return None
@@ -129,7 +128,7 @@ class Menu(metaclass=ABCMeta):
 		if self.active_option:
 			return self.active_option.value
 	def take_control(self):
-		self.controls.take(self.handle_control_down, self.handle_control_up)
+		self.controls.take(self.handle_control)
 	def show(self):
 		self.screen.menu(options=self.option_names(),
 				 active=self.active_name)
@@ -180,12 +179,10 @@ class ValueMenu(Menu):
 			return
 		if isinstance(av, MenuValue):
 			av.dec(fine=self.fine)
-	def handle_control_down(self, control):
-		super().handle_control_down(control)
+	def handle_control(self, control):
+		super().handle_control(control)
 		if control is Control.bottom_left and self.controls.level is not Level.menu:
 			self.fine = True
-	def handle_control_up(self, control):
-		super().handle_control_up(control)
 		if control is Control.top_right:
 			self.inc_active_option()
 		if control is Control.top_left:

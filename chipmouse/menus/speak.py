@@ -20,8 +20,8 @@ class SpeakMenu(Menu):
 		self.screen.text(self.text + "|")
 	def start(self):
 		self.text = " "
-	def handle_control_down(self, control):
-		super().handle_control_down(control)
+	def handle_control(self, control):
+		super().handle_control(control)
 		if control is Control.menu_next:
 			self.screen.overlay_text(" ".join(self.active_value or []))
 		if control is Control.bottom_left:

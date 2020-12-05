@@ -154,8 +154,8 @@ class AdlMenu(Menu):
 			high = high + 12
 		self.screen.menu(options=names[low:high],
 				 active=self.active_name)
-	def handle_control_down(self, control):
-		super().handle_control_down(control)
+	def handle_control(self, control):
+		super().handle_control(control)
 		if control is self.next:
 			self.inc()
 			self.process.program_change(self.active_value)
