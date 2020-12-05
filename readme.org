@@ -22,6 +22,23 @@ Requirements:
 
 ** service files
 
+*** ~/.config/systemd/user/CHIPMOUSE.service
+#+begin_src conf :tangle ~/.config/systemd/user/a2jmidid.service
+[Unit]
+Description=CHIPMOUSE
+After=jackd.service
+
+[Service]
+Type=simple
+WorkingDirectory=/home/alarm/chipmouse
+Environment="TERM=xterm"
+ExecStart=sh -c 'python -m chipmouse -m pi'
+Restart=always
+
+[Install]
+WantedBy=default.target
+#+end_src
+
 *** ~/.config/systemd/user/a2jmidid.service
 
 #+begin_src conf :tangle ~/.config/systemd/user/a2jmidid.service
