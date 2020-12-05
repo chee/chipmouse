@@ -145,11 +145,11 @@ class Menu(metaclass=ABCMeta):
 
 class BlueMenuValue(MenuValue):
 	def __init__(self, name, default=0):
-		super().__init__(name=name, color=(0, 100, 250), default=default)
+		super().__init__(name=name, color=(0, 150, 250), default=default)
 
 class GreenMenuValue(MenuValue):
 	def __init__(self, name, default=0):
-		super().__init__(name=name, color=(30, 250, 80), default=default)
+		super().__init__(name=name, color=(10, 250, 120), default=default)
 
 class WhiteMenuValue(MenuValue):
 	def __init__(self, name, default=0):
@@ -157,7 +157,7 @@ class WhiteMenuValue(MenuValue):
 
 class OrangeMenuValue(MenuValue):
 	def __init__(self, name, default=0):
-		super().__init__(name=name, color=(250, 120, 0), default=default)
+		super().__init__(name=name, color=(250, 180, 0), default=default)
 
 class ValueMenu(Menu):
 	fine = False
