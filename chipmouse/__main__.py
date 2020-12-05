@@ -38,12 +38,12 @@ controls = Controls(args.mode)
 screen = Screen(args.mode)
 system = System(args.mode, screen=screen)
 menu = MainMenu([
-	SynthMenu(),
 	OpnMenu(),
 	AdlMenu(),
+	ThruMenu(),
+	SynthMenu(),
 	BackupMenu(),
 	SpeakMenu(),
-	ThruMenu()
 ])
 
 menu.set_platform(controls=controls,

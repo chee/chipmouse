@@ -134,7 +134,7 @@ class Screen():
 			x = self.margin
 			text_color = self.colors.white
 			lines = textwrap.wrap(option, width=18)
-			prev_lines = len(lines)
+			prev_lines = len(lines) - 1
 			if option == active:
 				text_color = self.colors.black
 				ImageDraw.Draw(image).rectangle(((0, y), (self.width, y + self.text_height)), self.colors.white)

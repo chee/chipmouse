@@ -1,5 +1,5 @@
 from typing import Optional
-from ..menu import ValueMenu
+from ..menu import FourValueMenu, ValueMenu
 from ..menu import CyanMenuValue, YellowMenuValue, GreenMenuValue, BlueMenuValue
 from ..jack_client import JackClient
 import numpy as np
@@ -84,27 +84,13 @@ class Synth(JackClient):
 		if self.playing:
 			buf += signal
 
-class SynthMenu(ValueMenu):
+class SynthMenu(FourValueMenu):
 	name = "synth"
-	cyan = CyanMenuValue("dogness", 50)
-	yellow = YellowMenuValue("wideness", 2)
-	blue = BlueMenuValue("averageness", 0)
-	green = GreenMenuValue("amount", 20)
 	synth: Optional[Synth] = None
-	def __init__(self):
-		# TODO rewrite 'ValueMenu' to expect cyan, yellow, blue and
-		# green to be defined and then do all of this automatically
-		# (or create a FourValueMenu that does this)
-		self.cyan.sub(self.cyan_change)
-		self.yellow.sub(self.yellow_change)
-		self.blue.sub(self.blue_change)
-		self.green.sub(self.green_change)
-		super().__init__(options=[
-			self.cyan,
-			self.yellow,
-			self.blue,
-			self.green
-		])
+	cyan_name = "factor"
+	cyan_default = 50
+	yellow_name = "detune"
+	yellow_default = 2
 	def start(self):
 		self.synth = Synth()
 	def cyan_change(self):
@@ -112,10 +98,6 @@ class SynthMenu(ValueMenu):
 		pass
 	def yellow_change(self):
 		self.synth.detune = self.yellow.value / 20
-		pass
-	def green_change(self):
-		pass
-	def blue_change(self):
 		pass
 	def quit(self):
 		self.synth.quit()

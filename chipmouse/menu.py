@@ -145,19 +145,19 @@ class Menu(metaclass=ABCMeta):
 
 class CyanMenuValue(MenuValue):
 	def __init__(self, name, default=0):
-		super().__init__(name=name, color=(0, 150, 150), default=default)
+		super().__init__(name=name, color=(0, 200, 250), default=default)
 
 class YellowMenuValue(MenuValue):
 	def __init__(self, name, default=0):
-		super().__init__(name=name, color=(150, 100, 30), default=default)
+		super().__init__(name=name, color=(250, 230, 80), default=default)
 
 class GreenMenuValue(MenuValue):
 	def __init__(self, name, default=0):
-		super().__init__(name=name, color=(0, 120, 0), default=default)
+		super().__init__(name=name, color=(0, 250, 150), default=default)
 
 class BlueMenuValue(MenuValue):
 	def __init__(self, name, default=0):
-		super().__init__(name=name, color=(30, 70, 180), default=default)
+		super().__init__(name=name, color=(30, 130, 250), default=default)
 
 class ValueMenu(Menu):
 	fine = False
@@ -192,6 +192,44 @@ class ValueMenu(Menu):
 	def show(self):
 		self.screen.value_menu(values=self.options,
 				       active=self.active_name)
+
+
+class FourValueMenu(ValueMenu):
+	cyan_name = "cyan"
+	yellow_name = "yellow"
+	blue_name = "blue"
+	green_name = "green"
+	cyan_default = 0
+	yellow_default = 0
+	blue_default = 0
+	green_default = 0
+	def cyan_change(self):
+		pass
+	def yellow_change(self):
+		pass
+	def blue_change(self):
+		pass
+	def green_change(self):
+		pass
+	def __init__(self):
+		self.cyan = CyanMenuValue(
+			self.cyan_name, self.cyan_default)
+		self.yellow = YellowMenuValue(
+			self.yellow_name, self.yellow_default)
+		self.blue = BlueMenuValue(
+			self.blue_name, self.blue_default)
+		self.green = GreenMenuValue(
+			self.green_name, self.green_default)
+		self.cyan.sub(self.cyan_change)
+		self.yellow.sub(self.yellow_change)
+		self.blue.sub(self.blue_change)
+		self.green.sub(self.green_change)
+		super().__init__(options=[
+			self.cyan,
+			self.yellow,
+			self.blue,
+			self.green
+		])
 
 
 class MenuWithSubmenus(Menu):
