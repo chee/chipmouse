@@ -5,21 +5,31 @@ from ..menu import Menu, Option
 from ..jack_client import JackClient
 from mido import MidiFile, MidiTrack, Message, bpm2tempo
 from ..op1_status import op1
-from random import randint
+from random import randint, choice, randrange
 import binascii
+from time import time
 
 HAT = 61
+
+def major(note):
+	return [note, note + 4, note + 7]
+
+def minor(note):
+	return [note, note + 4, note + 7]
+
 class BeatMenu(Menu, JackClient):
-	name = "beat"
+	name = "beats"
 	jack_client_name = "chipmouse.beat"
 	next = Control.bottom_left
 	prev = Control.top_left
 	mid = None
 	offset = 0
+	beat = 0
 	def __init__(self):
 		super().__init__([
 			Option("HAT-hat", self.one),
-			Option("hat?hat?hat", self.two)
+			Option("hat?hat?hat", self.two),
+			Option("CHR", self.three)
 		])
 		self.op1 = op1
 	def one(self):
@@ -33,7 +43,6 @@ class BeatMenu(Menu, JackClient):
 		self.mid = iter(self.midifile)
 		self.msg = next(self.mid)
 	def two(self):
-		pass
 		self.midifile = MidiFile()
 		track = MidiTrack()
 		self.midifile.tracks.append(track)
@@ -41,6 +50,20 @@ class BeatMenu(Menu, JackClient):
 		track.append(Message("note_off", note=HAT, velocity=127, time=32))
 		track.append(Message("note_on", note=HAT, velocity=randint(0, 127), time=64))
 		track.append(Message("note_off", note=HAT, velocity=64, time=96))
+		self.mid = iter(self.midifile)
+		self.msg = next(self.mid)
+	def three(self):
+		self.midifile = MidiFile()
+		track = MidiTrack()
+		self.midifile.tracks.append(track)
+		roots = [48, 50, 52, 53, 55, 57, 59, 60]
+		for time in range(0, 1025, 32):
+			if randint(0, 20) > 15:
+				continue
+			for note in major(choice(roots)):
+				track.append(Message("note_on", note=note, velocity=randint(63, 100), time=time))
+				off_time = randrange(0, 129, 32)
+				track.append(Message("note_off", note=note, velocity=127, time=off_time))
 		self.mid = iter(self.midifile)
 		self.msg = next(self.mid)
 	def show(self):
@@ -59,9 +82,15 @@ class BeatMenu(Menu, JackClient):
 	def quit(self):
 		self.deactivate_jack_client()
 		super().quit()
+	last_beat_time = 0
 	def jack_process_callback(self, frame):
 		for offset, data in self.midi_in[0].incoming_midi_events():
-			print(binascii.hexlify(data).decode())
+			event = binascii.hexlify(data).decode()
+			if event == "f8":
+				print(offset)
+				print(time() - self.last_beat_time)
+				self.last_beat_time = time()
+				# print("beat", self. beat)
 		port = self.midi_out[0]
 		if not self.mid:
 			return
@@ -83,6 +112,7 @@ class BeatMenu(Menu, JackClient):
 	def start(self):
 		self.register_jack_client(midi_in=["clock"], midi_out=["beat"])
 		self.jack_client.connect(self.op1.output, self.midi_in[0])
-		self.connect_all_midi_to(self.jack_client.get_ports(is_midi=True, is_input=True))
+		self.jack_client.connect(self.midi_out[0], self.op1.input)
+		# self.connect_all_midi_to(self.jack_client.get_ports(is_midi=True, is_input=True))
 		self.active_value()
 		pass
