@@ -1,9 +1,11 @@
 from enum import Enum
+from typing import Callable, Optional
 from .mode import Mode
 
 class Level(Enum):
 	default = None
 	menu = 'menu'
+	submenu = 'submenu'
 
 class Control(Enum):
 	top_left = 'TL'
@@ -15,11 +17,15 @@ class Control(Enum):
 	menu_next = 'mnext'
 	menu_yes = 'myes'
 	menu_exit = 'mexit'
+	submenu_on = 'sub'
+	submenu_off = 'sub_off'
+	submenu_left = 'sub_left'
+	submenu_right = 'sub_right'
 
 class Controls():
 	level = Level.default
-	down_callback = None
-	up_callback = None
+	callback: Optional[Callable] = None
+	submenu = False
 	names = {
 		Mode.PI: {
 			Control.top_left: 'a',
@@ -88,7 +94,20 @@ class Controls():
 				self.callback(Control.menu_yes)
 			if control is Control.bottom_left:
 				self.callback(Control.menu_next)
+		elif control is Control.bottom_left and self.submenu:
+			if down:
+				self.level = Level.submenu
+				self.callback(Control.submenu_on)
+			else:
+				self.level = Level.default
+				self.callback(Control.submenu_off)
+		elif self.level is Level.submenu and down:
+			if control is Control.top_right:
+				self.callback(Control.submenu_right)
+			if control is Control.top_left:
+				self.callback(Control.submenu_left)
 		elif self.callback and down:
 			self.callback(control)
-	def take(self, callback):
+	def take(self, callback, has_submenu=False):
 		self.callback = callback
+		self.submenu = has_submenu

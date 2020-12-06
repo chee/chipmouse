@@ -128,11 +128,11 @@ class Screen():
 		image = self.image()
 		index = 0
 		prev_lines = 0
+		top = self.text_height
 		for value in values:
 			option = value.name
-			# value is 0 to 100
-			value_width = value.value * self.width // 100
-			y = (index + prev_lines) * (self.text_height + 1)
+			value_width = value.index * self.width // value.max
+			y = top + ((index + prev_lines) * (self.text_height + 1))
 			x = self.margin
 			lines = textwrap.wrap(option, width=18)
 			height = (self.text_height + 1) * len(lines)
@@ -158,5 +158,8 @@ class Screen():
 							   fill=text_color,
 							   font=self.font)
 			index += 1
+		ImageDraw.Draw(image).text(xy=(0, 0), text="-", font=self.font)
+		ImageDraw.Draw(image).text(xy=(self.width - 14, 0), text="+", font=self.font)
+		ImageDraw.Draw(image).text(xy=(0, self.height - 24), text="f", font=self.font)
 
 		return self.show(image)

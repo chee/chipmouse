@@ -1,5 +1,6 @@
 from abc import abstractmethod, ABCMeta
-from typing import List, Optional, Dict
+from enum import Enum
+from typing import Callable, List, Optional, Dict, Sequence, Tuple, Union
 from .screen import Screen
 from .system import System
 from .controls import Controls, Control, Level
@@ -13,29 +14,41 @@ class Option(Generic[OptionValue]):
 		self.value: OptionValue = value
 
 class MenuValue(Option, Generic[OptionValue]):
-	subs = []
-	def __init__(self, name: str, color, default = 0):
+	def __init__(self, name: str,
+		     color: Tuple[int, int, int],
+		     seq: Sequence[OptionValue],
+		     initial = 0,
+		     step=10,
+		     finestep=1,
+		     callback=lambda _:_):
 		self.name = name
-		self.value: OptionValue = default
+		self.seq = seq
+		self.index = initial
+		self.step = step
+		self.finestep = finestep
 		self.color = color
+		self.callback = callback
+	@property
+	def value(self) -> OptionValue:
+		 return self.seq[self.index]
+	@property
+	def max(self):
+		return len(self.seq) - 1
 	def inc(self, fine=False):
-		self.value += 1 if fine else 10
-		if self.value > 100:
-			self.value = 100
+		self.index += self.finestep if fine else self.step
+		if self.index > self.max:
+			self.index = self.max
 		self.announce()
 	def dec(self, fine=False):
-		self.value -= 1 if fine else 10
-		if self.value < 0:
-			self.value = 0
+		self.index -= self.finestep if fine else self.step
+		if self.index < 0:
+			self.index = 0
 		self.announce()
-	def sub(self, fn):
-		self.subs.append(fn)
-		return lambda : self.subs.remove(fn)
 	def announce(self):
-		for fn in self.subs:
-			fn()
+		self.callback(self.value)
 
 class Menu(metaclass=ABCMeta):
+	has_submenu = False
 	parent: Optional['Menu'] = None
 	_screen: Optional[Screen] = None
 	_controls: Optional[Controls] = None
@@ -128,7 +141,8 @@ class Menu(metaclass=ABCMeta):
 		if self.active_option:
 			return self.active_option.value
 	def take_control(self):
-		self.controls.take(self.handle_control)
+		self.controls.take(self.handle_control,
+				   has_submenu=self.has_submenu)
 	def show(self):
 		self.screen.menu(options=self.option_names(),
 				 active=self.active_name)
@@ -143,102 +157,79 @@ class Menu(metaclass=ABCMeta):
 			self.parent.show()
 			self.parent.take_control()
 
-class BlueMenuValue(MenuValue):
-	def __init__(self, name, default=0):
-		super().__init__(name=name, color=(0, 150, 250), default=default)
-
-class GreenMenuValue(MenuValue):
-	def __init__(self, name, default=0):
-		super().__init__(name=name, color=(10, 250, 120), default=default)
-
-class WhiteMenuValue(MenuValue):
-	def __init__(self, name, default=0):
-		super().__init__(name=name, color=(255, 255, 255), default=default)
-
-class OrangeMenuValue(MenuValue):
-	def __init__(self, name, default=0):
-		super().__init__(name=name, color=(250, 180, 0), default=default)
-
 class ValueMenu(Menu):
-	fine = False
 	options: List[MenuValue]
-	def __init__(self, options: List[MenuValue]):
-		self.options = options
+	has_submenu = True
+	def __init__(self, options: Optional[List[MenuValue]] = None):
+		self.options = options or []
 		self.active = 0
-	def inc_active_option(self):
-		av = self.active_option
-		if not av:
+	def register(self, mv: MenuValue):
+		self.options.append(mv)
+		self.show()
+	def inc_active_option(self, fine=False):
+		active = self.active_option
+		if not active:
 			return
-		if isinstance(av, MenuValue):
-			av.inc(fine=self.fine)
-	def dec_active_option(self):
-		av = self.active_option
-		if not av:
+		if isinstance(active, MenuValue):
+			active.inc(fine)
+	def dec_active_option(self, fine=False):
+		active = self.active_option
+		if not active:
 			return
-		if isinstance(av, MenuValue):
-			av.dec(fine=self.fine)
+		if isinstance(active, MenuValue):
+			active.dec(fine)
 	def handle_control(self, control):
 		super().handle_control(control)
-		if control is Control.bottom_left and self.controls.level is not Level.menu:
-			self.fine = True
 		if control is Control.top_right:
 			self.inc_active_option()
 		if control is Control.top_left:
 			self.dec_active_option()
-		if control is Control.bottom_left:
-			self.fine = False
+		if control is Control.submenu_right:
+			self.inc_active_option(fine=True)
+		if control is Control.submenu_left:
+			self.dec_active_option(fine=True)
+		self.show()
 	def show(self):
 		self.screen.value_menu(values=self.options,
 				       active=self.active_name)
+	def clear(self):
+		self.options = []
 
+class MenuColor(Enum):
+	first = (0, 150, 250)
+	second = (10, 250, 120)
+	third = (255, 255, 255)
+	fourth = (250, 180, 0)
 
 class FourValueMenu(ValueMenu):
-	blue_name = "blue"
-	green_name = "green"
-	orange_name = "orange"
-	white_name = "white"
-	blue_default = 0
-	orange_default = 0
-	green_default = 0
-	white_default = 0
-	subs = []
-	def blue_change(self):
-		pass
-	def green_change(self):
-		pass
-	def orange_change(self):
-		pass
-	def white_change(self):
-		pass
-	def __init__(self):
-		self.blue = BlueMenuValue(
-			self.blue_name, self.blue_default)
-		self.green = GreenMenuValue(
-			self.green_name, self.green_default)
-		self.white = WhiteMenuValue(
-			self.white_name, self.white_default)
-		self.orange = OrangeMenuValue(
-			self.orange_name, self.orange_default)
-		super().__init__(options=[
-			self.blue,
-			self.green,
-			self.white,
-			self.orange
-		])
-	def sub(self, color, fn):
-		self.subs.append(color.sub(fn))
-		self.subs.append(color.sub(self.show))
+	colors = {}
+	def __getitem__(self, name):
+		return self.colors[name]
+	def __setitem__(self, name, value):
+		self.colors[name] = value
+	def register(self,
+		     name: str,
+		     color: MenuColor,
+		     seq: Sequence,
+		     initial: int,
+		     step: int,
+		     finestep: int,
+		     callback: Callable):
+		menu_value = MenuValue(name, color.value, seq, initial, step, finestep, callback)
+		super().register(menu_value)
+		self[menu_value.name] = menu_value
+		self[color.name] = menu_value
 	def start(self):
-		self.sub(self.blue, self.blue_change)
-		self.sub(self.green, self.green_change)
-		self.sub(self.white, self.white_change)
-		self.sub(self.orange, self.orange_change)
+		for menu_color in ["first", "second", "third", "fourth"]:
+			try:
+				self.__getitem__(menu_color)
+			except:
+				raise RuntimeError(f"You must register all four mvs. missing: {menu_color}")
+		super().start()
 	def quit(self):
-		for sub in self.subs:
-			sub()
-		self.subs = []
+		self.colors.clear()
+		self.clear()
 		super().quit()
-
 
 class MenuWithSubmenus(Menu):
 	def __init__(self, submenus: List[Menu]):

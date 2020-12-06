@@ -1,6 +1,5 @@
 from typing import Optional
-from ..menu import FourValueMenu, ValueMenu
-from ..menu import BlueMenuValue, GreenMenuValue, GreenMenuValue, BlueMenuValue
+from ..menu import FourValueMenu, ValueMenu, MenuColor
 from ..jack_client import JackClient
 import numpy as np
 import operator
@@ -48,6 +47,10 @@ class Synth(JackClient):
 	detune = 0.9
 	factor = 2.0
 	_op = operator.add
+	def set_factor(self, factor):
+		self.factor = factor
+	def set_detune(self, detune):
+		self.deturn = detune
 	@property
 	def fm(self):
 		return self.frequency - self.detune
@@ -87,19 +90,39 @@ class Synth(JackClient):
 class SynthMenu(FourValueMenu):
 	name = "synth"
 	synth: Optional[Synth] = None
-	blue_name = "factor"
-	blue_default = 50
-	green_name = "detune"
-	green_default = 2
 	def start(self):
 		self.synth = Synth()
+		factors = np.arange(0.0, 5.0, 0.1)
+		detunes = np.arange(0.0, 5.0, 0.1)
+		super().register("factor",
+				 color=MenuColor.first,
+				 seq=factors,
+				 finestep=1,
+				 step=10,
+				 initial=len(factors) // 2,
+				 callback=self.synth.set_factor)
+		super().register("detune",
+				 color=MenuColor.second,
+				 seq=detunes,
+				 finestep=1,
+				 step=10,
+				 initial=10,
+				 callback=self.synth.set_detune)
+		super().register("factor_2",
+				 color=MenuColor.third,
+				 seq=factors,
+				 finestep=1,
+				 step=10,
+				 initial=len(factors) // 2,
+				 callback=self.synth.set_factor)
+		super().register("detune_2",
+				 color=MenuColor.fourth,
+				 seq=detunes,
+				 finestep=1,
+				 step=10,
+				 initial=10,
+				 callback=self.synth.set_detune)
 		super().start()
-	def blue_change(self):
-		self.synth.factor = self.blue.value / 25
-		pass
-	def green_change(self):
-		self.synth.detune = self.green.value / 20
-		pass
 	def quit(self):
 		self.synth.quit()
 		super().quit()
