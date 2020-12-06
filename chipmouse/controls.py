@@ -98,7 +98,7 @@ class Controls():
 			if down:
 				self.level = Level.submenu
 				self.callback(Control.submenu_on)
-			else:
+			elif self.level == Level.submenu:
 				self.level = Level.default
 				self.callback(Control.submenu_off)
 		elif self.level is Level.submenu and down:

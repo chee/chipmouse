@@ -26,6 +26,7 @@ from .menus.synth import SynthMenu
 from .menus.thru import ThruMenu
 from .menus.beat import BeatMenu
 from .menus.cc import CcMenu
+from .menus.settings import SettingsMenu
 
 if args.mode is Mode.COMPUTER:
 	from . import tkroot
@@ -47,7 +48,8 @@ menu = MainMenu([
 	ThruMenu(),
 	BackupMenu(),
 	SpeakMenu(),
-	BeatMenu()
+	BeatMenu(),
+	SettingsMenu()
 ])
 
 menu.set_platform(controls=controls,

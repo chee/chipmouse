@@ -1,10 +1,15 @@
 from abc import abstractmethod, ABCMeta
 from enum import Enum
+from signal import valid_signals
+from threading import Thread
+from time import sleep, time
 from typing import Callable, List, Optional, Dict, Sequence, Tuple, Union
 from .screen import Screen
 from .system import System
 from .controls import Controls, Control, Level
 from typing import TypeVar, Generic
+import threading
+import numpy
 
 OptionValue = TypeVar('OptionValue')
 
@@ -43,6 +48,9 @@ class MenuValue(Option, Generic[OptionValue]):
 		self.index -= self.finestep if fine else self.step
 		if self.index < 0:
 			self.index = 0
+		self.announce()
+	def set(self, index):
+		self.index = index
 		self.announce()
 	def announce(self):
 		self.callback(self.value)
@@ -179,16 +187,19 @@ class ValueMenu(Menu):
 		if isinstance(active, MenuValue):
 			active.dec(fine)
 	def handle_control(self, control):
-		super().handle_control(control)
 		if control is Control.top_right:
 			self.inc_active_option()
+			self.show()
 		if control is Control.top_left:
 			self.dec_active_option()
+			self.show()
 		if control is Control.submenu_right:
 			self.inc_active_option(fine=True)
+			self.show()
 		if control is Control.submenu_left:
 			self.dec_active_option(fine=True)
-		self.show()
+			self.show()
+		super().handle_control(control)
 	def show(self):
 		self.screen.value_menu(values=self.options,
 				       active=self.active_name)
@@ -201,8 +212,10 @@ class MenuColor(Enum):
 	third = (255, 255, 255)
 	fourth = (250, 180, 0)
 
+
 class FourValueMenu(ValueMenu):
 	colors = {}
+	sine_menus: Dict[str, "SineMenu"] = {}
 	def __getitem__(self, name):
 		return self.colors[name]
 	def __setitem__(self, name, value):
@@ -215,7 +228,15 @@ class FourValueMenu(ValueMenu):
 		     step: int,
 		     finestep: int,
 		     callback: Callable):
-		menu_value = MenuValue(name, color.value, seq, initial, step, finestep, callback)
+		menu_value = MenuValue(name=name,
+				       color=color.value,
+				       seq=seq,
+				       initial=initial,
+				       step=step,
+				       finestep=finestep,
+				       callback=callback)
+		self.sine_menus[name] = SineMenu(menu_value)
+		self.sine_menus[name].parent = self
 		super().register(menu_value)
 		self[menu_value.name] = menu_value
 		self[color.name] = menu_value
@@ -226,17 +247,111 @@ class FourValueMenu(ValueMenu):
 			except:
 				raise RuntimeError(f"You must register all four mvs. missing: {menu_color}")
 		super().start()
+	def select(self, option):
+		sm = self.sine_menus[option.name]
+		sm.start()
+		sm.take_control()
+		sm.show()
+		sm.thread = Thread(target=sm.loop)
+		sm.thread.start()
 	def quit(self):
 		self.colors.clear()
+		for _, menu in self.sine_menus.items():
+			menu.looping = False
+		self.sine_menus.clear()
 		self.clear()
 		super().quit()
 
+class SineMenu(FourValueMenu):
+	mode = "set"
+	looping = False
+	thread: Optional[Thread] = None
+	time = 0
+	def __init__(self, menu_value: MenuValue):
+		self.menu_value = menu_value
+		super().__init__()
+	def set_mode(self, mode):
+		self.mode = mode
+	def start(self):
+		if len(self.options):
+			super().start()
+			return
+		self.register("mode",
+			      MenuColor.first,
+			      ["set", "sine"],
+			      step=1,
+			      finestep=1,
+			      initial=0,
+			      callback=self.set_mode)
+		self.register("sine_freq",
+			      MenuColor.second,
+			      numpy.arange(0.01, 40.0, 0.01),
+			      step=10,
+			      finestep=1,
+			      initial=1,
+			      callback=self.set_speed)
+		self.register("sine_start",
+			      MenuColor.third,
+			      range(self.menu_value.max + 1),
+			      step=10,
+			      finestep=1,
+			      initial=0,
+			      callback=self.set_start)
+		self.register("sine_end",
+			      MenuColor.fourth,
+			      range(self.menu_value.max + 1),
+			      step=10,
+			      finestep=1,
+			      initial=self.menu_value.max,
+			      callback=self.set_end)
+		super().start()
+	def set_speed(self, speed):
+		#self.sspeed = speed
+		pass
+	def set_start(self, start):
+		#self.sstart = start
+		pass
+	def set_end(self, end):
+		#self.send = end
+		pass
+	def next(self):
+		value = self.menu_value.value
+		if self.mode == "set":
+			return value
+		if self.mode == "sine":
+			freq = self.__getitem__("sine_freq").value
+			max = self.menu_value.max
+			granules = max * 2
+			sleeptime = 0.1
+			sleep(sleeptime)
+			self.time = self.time + (freq/granules) + (sleeptime*freq*1000)
+			signal = numpy.sin(2 * numpy.pi * self.time / granules)
+			value = (signal * max / 2) + max / 2
+			return int(value)
+	def loop(self):
+		self.looping = True
+		previous = 0
+		while self.looping:
+			if self.mode == "set":
+				continue
+			value = self.next()
+			if value != previous:
+				self.menu_value.set(value)
+				previous = value
+	def quit(self):
+		# our parents will kill us when it's time for them to die
+		#self.looping = False
+		Menu.quit(self)
+
+
+
 class MenuWithSubmenus(Menu):
-	def __init__(self, submenus: List[Menu]):
+	def __init__(self, submenus: Optional[List[Menu]] = None):
 		options = []
-		for menu in submenus:
-			menu.parent = self
-			options.append(Option(menu.name, menu))
+		if submenus:
+			for menu in submenus:
+				menu.parent = self
+				options.append(Option(menu.name, menu))
 		super().__init__(list(options))
 
 	def select(self, option):

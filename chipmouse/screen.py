@@ -20,7 +20,7 @@ class Screen():
 		self.op1.start(error=self.error)
 		self.mode = mode
 		if mode is Mode.PI:
-			from ST7789 import ST7789, BG_SPI_CS_FRONT
+			from ST7789 import ST7789
 			self.st7789 = ST7789(
 				rotation=90,
 				port=0,
@@ -126,17 +126,14 @@ class Screen():
 
 	def value_menu(self, values, active):
 		image = self.image()
-		index = 0
-		prev_lines = 0
 		top = self.text_height
-		for value in values:
+		for index in range(len(values)):
+			value = values[index]
 			option = value.name
 			value_width = value.index * self.width // value.max
-			y = top + ((index + prev_lines) * (self.text_height + 1))
+			y = top + (index * (self.text_height + 1))
 			x = self.margin
-			lines = textwrap.wrap(option, width=18)
-			height = (self.text_height + 1) * len(lines)
-			prev_lines = len(lines) - 1
+			height = (self.text_height + 1)
 			text_color = (0x00, 0x00, 0x00)
 			if option == active:
 				ImageDraw.Draw(image).rectangle(
@@ -151,13 +148,16 @@ class Screen():
 				value.color
 			)
 
-			for line_number in range(len(lines)):
-				line = lines[line_number]
-				xy = (x, y + (line_number * self.text_height))
-				ImageDraw.Draw(image).text(xy=xy, text=line,
-							   fill=text_color,
-							   font=self.font)
-			index += 1
+			ImageDraw.Draw(image).text(xy=(x, y),
+						   text=option,
+						   fill=text_color,
+						   font=self.font)
+
+			vtext = str(value.value)
+			twidth = len(vtext) * 10
+			ImageDraw.Draw(image).text(xy=(self.width - twidth, (y + self.text_height / 2) - 5),
+						   text=vtext,
+						   fill=text_color)
 		ImageDraw.Draw(image).text(xy=(0, 0), text="-", font=self.font)
 		ImageDraw.Draw(image).text(xy=(self.width - 14, 0), text="+", font=self.font)
 		ImageDraw.Draw(image).text(xy=(0, self.height - 24), text="f", font=self.font)
