@@ -322,15 +322,15 @@ class SineMenu(FourValueMenu):
 			freq = self.__getitem__("sine_freq").value
 			max = self.menu_value.max
 			granules = max * 2
-			sleeptime = 0.1
+			sleeptime = 0.001
 			sleep(sleeptime)
 			self.time = self.time + (freq/granules) + (sleeptime*freq*1000)
 			signal = numpy.sin(2 * numpy.pi * self.time / granules)
-			value = (signal * max / 2) + max / 2
+			value = (signal + 1) * (max / 2)
 			return int(value)
 	def loop(self):
 		self.looping = True
-		previous = 0
+		previous = None
 		while self.looping:
 			if self.mode == "set":
 				continue

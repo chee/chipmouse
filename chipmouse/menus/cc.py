@@ -3,12 +3,12 @@ from ..menu import FourValueMenu, MenuColor
 from ..jack_client import JackClient
 import numpy as np
 from ..op1_status import op1
-from queue import SimpleQueue
 
 class CcMenu(FourValueMenu, JackClient):
 	jack_client_name = "chipmouse.lfo"
 	name = "lfo"
-	offset = 0
+	queue = []
+	last_event = None
 	def start(self):
 		self.register_jack_client(midi_out=["cc"])
 		try:
@@ -45,8 +45,14 @@ class CcMenu(FourValueMenu, JackClient):
 			      callback=lambda val: self.write(4, val))
 		super().start()
 	def write(self, cc, val):
-		event = [0xb0, cc, (((val * 126) // 100) + 1)]
-		self.midi_out[0].write_midi_event(self.offset, event)
-		self.offset += 1
-	def jack_process_callback(self, frame):
-		pass
+		event = [0xb0, cc, val]
+		self.queue.append(event)
+		self.last_event = event
+	def jack_process_callback(self, _frame):
+		events = list(self.queue)
+		print(events)
+		self.queue.clear()
+		for index in range(len(events)):
+			event = events[index]
+			print(event)
+			self.midi_out[0].write_midi_event(index, event)
