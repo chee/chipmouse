@@ -49,7 +49,7 @@ class Screen():
 			   ImageDraw.Draw(image).ellipse((220, 220, 230, 230), fill=(0, 255, 0))
 		else:
 			   ImageDraw.Draw(image).ellipse((220, 220, 230, 230), fill=(255, 0, 0))
-		if self.controls.Level is Level.menu:
+		if self.controls.level is Level.menu:
 			image = self.create_menu_hint(image)
 		if self.mode is Mode.COMPUTER:
 			from tkinter import NW
