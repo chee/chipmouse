@@ -80,7 +80,7 @@ class TargetMenu(MenuWithSubmenus):
 	def start(self, source, targets):
 		self.source = source
 		self.targets = targets
-		super().__init__(list(map(ConnectedMenu, targets)))
+		super().__init__([ConnectedMenu(target) for target in targets])
 	def select(self, option):
 		option.value.start(self.source, option.name)
 		option.value.show()
@@ -93,10 +93,9 @@ class ThruMenu(MenuWithSubmenus):
 	def start(self):
 		self.watcher = Watcher()
 		self.watcher.start()
-		get_name = lambda port : port.name
-		sources = list(map(get_name, self.watcher.jack_client.get_ports(is_midi=True, is_output=True)))
-		self.targets = list(map(get_name, self.watcher.jack_client.get_ports(is_midi=True, is_input=True)))
-		super().__init__(list(map(TargetMenu, sources)))
+		sources = [port.name for port in self.watcher.jack_client.get_ports(is_midi=True, is_output=True)]
+		self.targets = [port.name for port in self.watcher.jack_client.get_ports(is_midi=True, is_input=True)]
+		super().__init__([TargetMenu(source) for source in sources])
 		# self.thru = Thru()
 		# self.thru.start()
 		# self.process = subprocess.Popen(["jackthru", source_name, target_name])

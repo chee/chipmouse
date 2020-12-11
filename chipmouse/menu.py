@@ -133,7 +133,7 @@ class Menu(metaclass=ABCMeta):
 	def option_names(self):
 		if not self.options:
 			return None
-		return map(lambda o : o.name, self.options)
+		return [option.name for option in self.options]
 	@property
 	def active_option(self):
 		if self.options:

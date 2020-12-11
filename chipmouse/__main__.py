@@ -38,7 +38,7 @@ else:
 			signal.pause()
 
 controls = Controls(args.mode)
-screen = Screen(args.mode)
+screen = Screen(args.mode, controls)
 system = System(args.mode, screen=screen)
 menu = MainMenu([
 	CcMenu(),

@@ -127,8 +127,7 @@ class Screen():
 	def value_menu(self, values, active):
 		image = self.image()
 		top = self.text_height
-		for index in range(len(values)):
-			value = values[index]
+		for index, value in enumerate(values):
 			option = value.name
 			value_width = value.index * self.width // value.max
 			y = top + (index * (self.text_height + 1))
