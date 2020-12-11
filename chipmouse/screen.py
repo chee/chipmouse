@@ -81,8 +81,9 @@ class Screen():
 		ImageDraw.Draw(image).rectangle(xy=bl_position, fill=(30, 255, 255))
 		return image
 	def overlay_menu_hint(self):
-		image = self.current_image.copy()
-		self.show(self.create_menu_hint(image), hint=True)
+		# image = self.current_image.copy()
+		# self.show(self.create_menu_hint(image), hint=True)
+		pass
 	def remove_menu_hint(self):
 		if self.current_image:
 			self.show(self.current_image)
