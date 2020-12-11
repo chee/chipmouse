@@ -319,7 +319,7 @@ class SineMenu(FourValueMenu):
 		if self.mode == "set":
 			return value
 		if self.mode == "sine":
-			freq = self.__getitem__("sine_freq").value
+			freq = self.colors["sine_freq"]
 			max = self.menu_value.max
 			granules = max * 2
 			sleeptime = 0.001

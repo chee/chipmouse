@@ -1,3 +1,4 @@
+from .controls import Level
 from PIL import Image, ImageDraw, ImageFont
 from .mode import Mode
 import textwrap
@@ -15,7 +16,8 @@ class Screen():
 	margin = 10
 	colors = Colors()
 	font = ImageFont.load("./chipmouse/fonts/terx24b.pil")
-	def __init__(self, mode):
+	def __init__(self, mode, controls):
+		self.controls = controls
 		self.op1 = op1
 		self.op1.start(error=self.error)
 		self.mode = mode
@@ -47,6 +49,8 @@ class Screen():
 			   ImageDraw.Draw(image).ellipse((220, 220, 230, 230), fill=(0, 255, 0))
 		else:
 			   ImageDraw.Draw(image).ellipse((220, 220, 230, 230), fill=(255, 0, 0))
+		if self.controls.Level is Level.menu:
+			image = self.create_menu_hint(image)
 		if self.mode is Mode.COMPUTER:
 			from tkinter import NW
 			from PIL import ImageTk
@@ -66,8 +70,7 @@ class Screen():
 					   font=self.font,
 					   fill=(100, 200, 250))
 		self.show(image, hint=True)
-	def overlay_menu_hint(self):
-		image = self.current_image.copy()
+	def create_menu_hint(self, image):
 		width = self.margin / 2
 		length = self.margin * 2
 		tl_position = ((0, 0), (width, length))
@@ -76,7 +79,10 @@ class Screen():
 		ImageDraw.Draw(image).rectangle(xy=tr_position, fill=(255, 150, 0))
 		ImageDraw.Draw(image).rectangle(xy=tl_position, fill=(30, 255, 50))
 		ImageDraw.Draw(image).rectangle(xy=bl_position, fill=(30, 255, 255))
-		self.show(image, hint=True)
+		return image
+	def overlay_menu_hint(self):
+		image = self.current_image.copy()
+		self.show(self.create_menu_hint(image), hint=True)
 	def remove_menu_hint(self):
 		if self.current_image:
 			self.show(self.current_image)
