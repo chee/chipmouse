@@ -71,7 +71,8 @@ class Synth(JackClient):
 					self.notes.append(pitch)
 					self.playing = True
 				elif status in (self.NOTEON, self.NOTEOFF):
-					self.notes.remove(pitch)
+					if pitch in self.notes:
+						self.notes.remove(pitch)
 					if len(self.notes) > 0:
 						if self.frequency == m2f(pitch):
 							self.frequency = m2f(self.notes[-1])
