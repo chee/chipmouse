@@ -50,9 +50,8 @@ class CcMenu(FourValueMenu, JackClient):
 		self.last_event = event
 	def jack_process_callback(self, _frame):
 		events = list(self.queue)
-		print(events)
 		self.queue.clear()
-		for index in range(len(events)):
+		for index, event in enumerate(events):
 			event = events[index]
-			print(event)
-			self.midi_out[0].write_midi_event(index, event)
+			if len(event):
+				self.midi_out[0].write_midi_event(index, event)
