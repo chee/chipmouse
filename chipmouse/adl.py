@@ -13,6 +13,7 @@ class AdlType(Enum):
 class AdlProcess(JackClient):
 	jack_client_name = "chipmouse.sega"
 	outport: Optional[jack.OwnMidiPort] = None
+	queue = []
 	def __init__(self, type=AdlType.adl):
 		self.type = type
 		command = ["adlrt", "-A", "jack", "-M", "jack"]
@@ -54,12 +55,12 @@ class AdlProcess(JackClient):
 		self.process.terminate()
 		self.process.kill()
 	def program_change(self, program):
-		self.write_midi([
-				0xc0,
-				program
-			])
-		pass
-
+		self.queue.append([0xc0, program])
 	def jack_process_callback(self, frame):
-		if self.outport:
-			self.outport.clear_buffer()
+		if not self.outport:
+			return
+		self.outport.clear_buffer()
+		events = list(self.queue)
+		self.queue.clear()
+		for index, event in enumerate(events):
+			self.outport.write_midi_event(index, event)
