@@ -93,7 +93,8 @@ class BeatMenu(Menu, JackClient):
 				self.last_beat_time = time()
 				# print("beat", self. beat)
 		port = self.outport
-		self.outport.clear_buffer()
+		if not port:
+			return
 		if not self.mid:
 			return
 		if self.msg is None:

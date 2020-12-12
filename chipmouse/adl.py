@@ -1,4 +1,5 @@
 from subprocess import PIPE
+from typing import Optional
 import jack
 import subprocess
 from time import sleep
@@ -11,6 +12,7 @@ class AdlType(Enum):
 
 class AdlProcess(JackClient):
 	jack_client_name = "chipmouse.sega"
+	outport: Optional[jack.OwnMidiPort] = None
 	def __init__(self, type=AdlType.adl):
 		self.type = type
 		command = ["adlrt", "-A", "jack", "-M", "jack"]
@@ -59,4 +61,5 @@ class AdlProcess(JackClient):
 		pass
 
 	def jack_process_callback(self, frame):
-		self.outport.clear_buffer()
+		if self.outport:
+			self.outport.clear_buffer()

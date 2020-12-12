@@ -3,11 +3,14 @@ from typing import Optional
 import jack
 import subprocess
 from time import sleep
+
+from jack import OwnMidiPort
 from .jack_client import JackClient
 import binascii
 
 class Monitor(JackClient):
 	jack_client_name = "chipmouse.monitor"
+	outport: Optional[OwnMidiPort] = None
 	def __init__(self):
 		self.register_jack_client(midi_in=["input"], midi_out=["output"])
 		self.input = self.midi_in[0]
@@ -21,6 +24,8 @@ class Monitor(JackClient):
 	def stop(self):
 		self.deactivate_jack_client()
 	def jack_process_callback(self, frame):
+		if not self.outport:
+			return
 		self.outport.clear_buffer()
 		for offset, data in self.input.incoming_midi_events():
 			print(f"input: [{self.jack_client.last_frame_time + offset}] {binascii.hexlify(data).decode()}")

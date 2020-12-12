@@ -1,4 +1,6 @@
 from typing import Optional
+
+from jack import OwnMidiPort
 from ..menu import FourValueMenu, MenuColor
 from ..jack_client import JackClient
 import numpy as np
@@ -9,6 +11,7 @@ class CcMenu(FourValueMenu, JackClient):
 	name = "lfo"
 	queue = []
 	last_event = None
+	outport: Optional[OwnMidiPort] = None
 	def start(self):
 		self.register_jack_client(midi_out=["cc"])
 		self.outport = self.midi_out[0]
@@ -50,6 +53,8 @@ class CcMenu(FourValueMenu, JackClient):
 		self.queue.append(event)
 		self.last_event = event
 	def jack_process_callback(self, _frame):
+		if not self.outport:
+			return
 		self.outport.clear_buffer()
 		events = list(self.queue)
 		self.queue.clear()
