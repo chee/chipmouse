@@ -28,11 +28,16 @@ class AdlProcess(JackClient):
 		sleep(3)
 		self.register_jack_client(midi_out=["program-change"])
 		self.outport = self.midi_out[0]
-		adl_in = list(filter(lambda port : "ADLrt" in port.name,
-				     self.jack_client.get_ports(is_midi=True, is_input=True)))
-
-		adl_out = list(filter(lambda port: "ADLrt" in port.name,
-				      self.jack_client.get_ports(is_audio=True, is_output=True)))
+		adl_in = [port for port in
+			  self.jack_client.get_ports(
+				  is_midi=True,
+				  is_input=True)
+			  if "ADLrt" in port.name]
+		adl_out = [port for port in
+			  self.jack_client.get_ports(
+				  is_audio=True,
+				  is_output=True)
+			  if "ADLrt" in port.name]
 
 		if len(adl_in) == 0:
 			error("Couldn't find ADLrt. Is it running?")

@@ -56,12 +56,13 @@ class Synth(JackClient):
 		return self.frequency - self.detune
 	def __init__(self):
 		self.register_jack_client(midi_in=["keys"], audio_out=["sounds"])
+		self.inport = self.midi_in[0]
 		self.connect_speakers_to(self.audio_out)
 		self.connect_all_midi_to(self.midi_in)
 	def quit(self):
 		self.deactivate_jack_client()
 	def jack_process_callback(self, blocksize):
-		for offset, data in self.midi_in[0].incoming_midi_events():
+		for offset, data in self.inport.incoming_midi_events():
 			if len(data) == 3:
 				status, pitch, vel = bytes(data)
 				# MIDI channel number is ignored!
