@@ -319,6 +319,9 @@ class SineMenu(FourValueMenu):
 		if self.mode == "set":
 			return value
 		if self.mode == "sine":
+			if not "sine_freq" in self.colors:
+				print("didn't have a sine_freq?")
+				return
 			freq = self.colors["sine_freq"]
 			max = self.menu_value.max
 			granules = max * 2

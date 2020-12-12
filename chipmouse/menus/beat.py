@@ -25,6 +25,7 @@ class BeatMenu(Menu, JackClient):
 	mid = None
 	offset = 0
 	beat = 0
+	msg = None
 	def __init__(self):
 		super().__init__([
 			Option("HAT-hat", self.one),
