@@ -322,7 +322,7 @@ class SineMenu(FourValueMenu):
 			if not "sine_freq" in self.colors:
 				print("didn't have a sine_freq?")
 				return
-			freq = self.colors["sine_freq"]
+			freq = self.colors["sine_freq"].value
 			max = self.menu_value.max
 			granules = max * 2
 			sleeptime = 0.001
