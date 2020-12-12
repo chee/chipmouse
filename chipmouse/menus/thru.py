@@ -39,6 +39,7 @@ class Thru(JackClient):
 		if self.external:
 			return
 		if self.pythru_in:
+			self.pythru_out.clear_buffer()
 			for offset, data in self.pythru_in.incoming_midi_events():
 				self.pythru_out.write_midi_event(self.jack_client.last_frame_time + offset, data)
 				print("sending {data}")

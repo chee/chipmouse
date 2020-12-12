@@ -11,8 +11,9 @@ class CcMenu(FourValueMenu, JackClient):
 	last_event = None
 	def start(self):
 		self.register_jack_client(midi_out=["cc"])
+		self.outport = self.midi_out[0]
 		try:
-			self.jack_client.connect(self.midi_out[0], op1.input)
+			self.jack_client.connect(self.outport, op1.input)
 		except:
 			print("no connection to op1, check dot")
 		self.register("cc1",
@@ -49,9 +50,10 @@ class CcMenu(FourValueMenu, JackClient):
 		self.queue.append(event)
 		self.last_event = event
 	def jack_process_callback(self, _frame):
+		self.outport.clear_buffer()
 		events = list(self.queue)
 		self.queue.clear()
 		for index, event in enumerate(events):
 			event = events[index]
 			if len(event):
-				self.midi_out[0].write_midi_event(index, event)
+				self.outport.write_midi_event(index, event)
