@@ -267,7 +267,7 @@ class SineMenu(FourValueMenu):
 	looping = False
 	thread: Optional[Thread] = None
 	time = 0
-	_freq = 0.1
+	_freq = 0.02
 	_start = 1
 	_end = 127
 	def __init__(self, menu_value: MenuValue):
@@ -335,7 +335,7 @@ class SineMenu(FourValueMenu):
 					   * numpy.pi
 					   * self.time
 					   / granules)
-			value = (signal + 1) * ((max / 2) + min)
+			value = (signal + 1) * ((max - min) / 2) + (min / 2)
 			return int(value)
 	def loop(self):
 		self.looping = True
