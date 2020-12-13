@@ -267,6 +267,9 @@ class SineMenu(FourValueMenu):
 	looping = False
 	thread: Optional[Thread] = None
 	time = 0
+	_freq = 0.1
+	_start = 1
+	_end = 127
 	def __init__(self, menu_value: MenuValue):
 		self.menu_value = menu_value
 		super().__init__()
@@ -276,6 +279,7 @@ class SineMenu(FourValueMenu):
 		if len(self.options):
 			super().start()
 			return
+		self._end = self.menu_value.max
 		self.register("mode",
 			      MenuColor.first,
 			      ["set", "sine"],
@@ -302,17 +306,17 @@ class SineMenu(FourValueMenu):
 			      range(self.menu_value.max + 1),
 			      step=10,
 			      finestep=1,
-			      initial=self.menu_value.max,
+			      initial=self._end,
 			      callback=self.set_end)
 		super().start()
 	def set_speed(self, speed):
-		#self.sspeed = speed
+		self._freq = speed
 		pass
 	def set_start(self, start):
-		#self.sstart = start
+		self._start = start
 		pass
 	def set_end(self, end):
-		#self.send = end
+		self._end = end
 		pass
 	def next(self):
 		value = self.menu_value.value
@@ -322,14 +326,16 @@ class SineMenu(FourValueMenu):
 			if not "sine_freq" in self.colors:
 				print("didn't have a sine_freq?")
 				return
-			freq = self.colors["sine_freq"].value
-			max = self.menu_value.max
-			granules = max * 2
-			sleeptime = 0.001
-			sleep(sleeptime)
-			self.time = self.time + (freq/granules) + (sleeptime*freq*1000)
-			signal = numpy.sin(2 * numpy.pi * self.time / granules)
-			value = (signal + 1) * (max / 2)
+			freq = self._freq
+			max = self._end
+			min = self._start
+			granules = (max - min) * 2
+			self.time = self.time + (freq/granules)
+			signal = numpy.sin(2
+					   * numpy.pi
+					   * self.time
+					   / granules)
+			value = (signal + 1) * ((max / 2) + min)
 			return int(value)
 	def loop(self):
 		self.looping = True

@@ -6,7 +6,6 @@ Requirements:
 - pirate audio headphone amp
 - op-1
 - a running jack2 server
-- a2jmidid
 - adlrt
 - espeak
 - the op-1 disk needs to automount to ~~/op-1/disk~. TODO add instructions for this with udisks2 and a symlink
@@ -14,6 +13,9 @@ Requirements:
 ** Setup
 1. install arch linux on your rapsberry pi microsd https://archlinuxarm.org/platforms/armv6/raspberry-pi
 
+
+** notes
+highly recommend swithing to COM mode and switching to OPT and turning off >-[X]-> so it doesn't draw too much electric
 
 ** hoo-hoo
 
@@ -66,5 +68,5 @@ ExecStart=/bin/a2jmidid -e
   [Service]
   Type=simple
   Restart=always
-  ExecStart=/usr/bin/jackd -d alsa -r 14700 -p 512 -n 2
+  ExecStart=/usr/bin/jackd -d alsa -r 24000 -p 256 -n 2
 #+end_src
