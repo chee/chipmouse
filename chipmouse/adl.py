@@ -5,6 +5,7 @@ import subprocess
 from time import sleep
 from .jack_client import JackClient
 from enum import Enum
+import gc
 
 class AdlType(Enum):
 	adl = 'adl'
@@ -32,14 +33,14 @@ class AdlProcess(JackClient):
 		self.register_jack_client(midi_out=["program-change"])
 		self.outport = self.midi_out[0]
 		adl_in = [port for port in
-			  self.jack_client.get_ports(
-				  is_midi=True,
-				  is_input=True)
+				self.jack_client.get_ports(
+					is_midi=True,
+					is_input=True)
 			  if "ADLrt" in port.name]
 		adl_out = [port for port in
-			  self.jack_client.get_ports(
-				  is_audio=True,
-				  is_output=True)
+				 self.jack_client.get_ports(
+					 is_audio=True,
+					 is_output=True)
 			  if "ADLrt" in port.name]
 
 		if len(adl_in) == 0:
@@ -59,10 +60,15 @@ class AdlProcess(JackClient):
 	def jack_process_callback(self, frame):
 		if not self.outport:
 			return
+
 		self.outport.clear_buffer()
 		if not len(self.queue):
 			   return
-		events = list(self.queue)
+
+		events = list(self.queue)[0:1024]
 		self.queue.clear()
 		for index, event in enumerate(events):
-			self.outport.write_midi_event(index, event)
+			try:
+				self.outport.write_midi_event(index, event)
+			except:
+				print(f"failed to write {event}")
