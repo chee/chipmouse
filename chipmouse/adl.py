@@ -60,6 +60,8 @@ class AdlProcess(JackClient):
 		if not self.outport:
 			return
 		self.outport.clear_buffer()
+		if not len(self.queue):
+			   return
 		events = list(self.queue)
 		self.queue.clear()
 		for index, event in enumerate(events):

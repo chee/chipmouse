@@ -4,6 +4,14 @@ from typing import List, Optional
 import jack
 import itertools
 
+def name_or_alias_contains(port: jack.MidiPort, string: str) -> bool:
+	if string in port.name:
+		return True
+	for alias in port.aliases:
+		if string in alias:
+			return True
+	return False
+
 class JackClient(metaclass=ABCMeta):
 	jack_connections = []
 	jack_client: Optional[jack.Client] = None

@@ -88,8 +88,6 @@ class BeatMenu(Menu, JackClient):
 		for offset, data in self.midi_in[0].incoming_midi_events():
 			event = binascii.hexlify(data).decode()
 			if event == "f8":
-				print(offset)
-				print(time() - self.last_beat_time)
 				self.last_beat_time = time()
 				# print("beat", self. beat)
 		port = self.outport

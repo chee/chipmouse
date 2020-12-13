@@ -66,5 +66,5 @@ ExecStart=/bin/a2jmidid -e
   [Service]
   Type=simple
   Restart=always
-  ExecStart=/usr/bin/jackd -d alsa -r 24000 -p 1024 -n 2
+  ExecStart=/usr/bin/jackd -d alsa -r 14700 -p 512 -n 2
 #+end_src
