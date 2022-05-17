@@ -2,6 +2,6 @@ cffi==1.14.4
 JACK-Client==0.5.3
 mido==1.2.9
 numpy==1.20.0rc1
-Pillow==8.0.1
+Pillow==9.0.1
 pycparser==2.20
 ST7789==0.0.2
