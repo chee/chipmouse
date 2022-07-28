@@ -58,8 +58,6 @@ highly recommend swithing to COM mode and switching to OPT and turning off >-[X]
 
 ```desktop
 [Unit]
-
-
 Description=CHIPMOUSE
 After=jackd.service
 
