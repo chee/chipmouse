@@ -56,50 +56,53 @@ highly recommend swithing to COM mode and switching to OPT and turning off >-[X]
 
 ### ~/.config/systemd/user/CHIPMOUSE.service
 
-    [Unit]
-    Description=CHIPMOUSE
-    After=jackd.service
-    
-    [Service]
-    Type=simple
-    WorkingDirectory=/home/alarm/chipmouse
-    Environment="TERM=xterm"
-    ExecStart=sh -c 'python -m chipmouse -m pi'
-    Restart=always
-    
-    [Install]
-    WantedBy=default.target
+```systemd
+[Unit]
+Description=CHIPMOUSE
+After=jackd.service
 
+[Service]
+Type=simple
+WorkingDirectory=/home/alarm/chipmouse
+Environment="TERM=xterm"
+ExecStart=sh -c 'python -m chipmouse -m pi'
+Restart=always
+
+[Install]
+WantedBy=default.target
+```
 
 <a id="orgc4e065d"></a>
 
 ### ~/.config/systemd/user/a2jmidid.service
 
-    [Unit]
-    Description=alsa to jack midi bridge daemon
-    After=jackd.service
-    
-    [Install]
-    WantedBy=default.target
-    
-    [Service]
-    Type=simple
-    ExecStart=/bin/a2jmidid -e
+```systemd
+[Unit]
+Description=alsa to jack midi bridge daemon
+After=jackd.service
 
+[Install]
+WantedBy=default.target
+
+[Service]
+Type=simple
+ExecStart=/bin/a2jmidid -e
+```
 
 <a id="org2218b01"></a>
 
 ### ~/.config/systemd/user/jackd.service
 
-    [Unit]
-    Description=Jack audio server
-    After=sound.target
-    
-    [Install]
-    WantedBy=default.target
-    
-    [Service]
-    Type=simple
-    Restart=always
-    ExecStart=/usr/bin/jackd -d alsa -r 24000 -p 256 -n 2
+```systemd
+[Unit]
+Description=Jack audio server
+After=sound.target
 
+[Install]
+WantedBy=default.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/bin/jackd -d alsa -r 24000 -p 256 -n 2
+```
