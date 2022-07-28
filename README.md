@@ -56,8 +56,10 @@ highly recommend swithing to COM mode and switching to OPT and turning off >-[X]
 
 ### ~/.config/systemd/user/CHIPMOUSE.service
 
-```systemd
+```desktop
 [Unit]
+
+
 Description=CHIPMOUSE
 After=jackd.service
 
@@ -76,7 +78,7 @@ WantedBy=default.target
 
 ### ~/.config/systemd/user/a2jmidid.service
 
-```systemd
+```desktop
 [Unit]
 Description=alsa to jack midi bridge daemon
 After=jackd.service
@@ -93,7 +95,7 @@ ExecStart=/bin/a2jmidid -e
 
 ### ~/.config/systemd/user/jackd.service
 
-```systemd
+```desktop
 [Unit]
 Description=Jack audio server
 After=sound.target
